@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RapidAid — Hospital</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="hospital-page">
+  <div id="setup" class="setup-box">
+    <h2>Hospital Sign-in</h2>
+    <select id="hospIdInput">
+      <option value="H1">City General Hospital (H1)</option>
+      <option value="H2">Amrita Hospital (H2)</option>
+      <option value="H3">St. Mary's Medical Center (H3)</option>
+    </select>
+    <button id="joinBtn">Go Live</button>
+  </div>
+
+  <div id="mainScreen" class="hospital-main hidden">
+    <h2 id="hospName"></h2>
+    <p class="idle-note" id="idleNote">No incoming patients</p>
+    <div id="incomingCard" class="incoming-card hidden">
+      <h3>🚑 Incoming Patient</h3>
+      <p><strong>Ambulance:</strong> <span id="incAmb"></span></p>
+      <p><strong>Severity:</strong> <span id="incSeverity"></span></p>
+      <p><strong>Note:</strong> <span id="incNote"></span></p>
+      <p><strong>Reported:</strong> <span id="incTime"></span></p>
+      <button id="ackBtn">Acknowledge & Prepare</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/hospital.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RapidAid — Dispatcher</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="dispatcher-page">
+  <div class="dispatch-header">
+    <h2>🖥️ RapidAid — Dispatcher Dashboard</h2>
+    <div class="dispatch-controls">
+      <button id="fitAllBtn">🔍 Fit All Markers</button>
+      <button id="incidentBtn">🚨 Report Incident (click map first)</button>
+      <button id="blockRoadBtn" class="danger-btn">⚠ Simulate Road Block</button>
+    </div>
+  </div>
+
+  <div class="dispatch-body">
+    <div id="map"></div>
+    <div class="log-panel">
+      <h3>Reasoning Log</h3>
+      <div id="logFeed"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/dispatcher.js"></script>
+</body>
+</html>

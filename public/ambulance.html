@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RapidAid — Ambulance</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="ambulance-page">
+  <div id="setup" class="setup-box">
+    <h2>Ambulance Sign-in</h2>
+    <input id="ambIdInput" placeholder="Ambulance ID e.g. A1" autocomplete="off" />
+    <button id="joinBtn">Start Duty</button>
+  </div>
+
+  <div id="statusScreen" class="status-screen hidden">
+    <div id="statusBadge" class="status-badge available">AVAILABLE</div>
+    <div id="idLabel" class="id-label"></div>
+    <div id="assignmentCard" class="assignment-card hidden">
+      <h3>New Assignment</h3>
+      <p id="assignIncident"></p>
+      <p id="assignHospital"></p>
+    </div>
+    <p class="gps-note">Streaming live GPS…</p>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/ambulance.js"></script>
+</body>
+</html>

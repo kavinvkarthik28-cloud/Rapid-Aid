@@ -1,0 +1,67 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, "Inter", "Segoe UI", sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+/* Landing */
+.landing { display: flex; align-items: center; justify-content: center; height: 100vh; }
+.landing-card { text-align: center; padding: 32px; }
+.landing-card h1 { font-size: 26px; margin-bottom: 4px; }
+.subtitle { color: #94a3b8; margin-bottom: 24px; }
+.role-btn {
+  display: block; margin: 12px auto; padding: 14px 28px; width: 260px;
+  border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 16px;
+  color: white;
+}
+.ambulance-btn { background: #dc2626; }
+.hospital-btn { background: #059669; }
+.dispatcher-btn { background: #2563eb; }
+
+/* Ambulance / Hospital shared setup box */
+.setup-box, .status-screen, .hospital-main {
+  max-width: 420px; margin: 60px auto; padding: 24px; text-align: center;
+}
+.setup-box input, .setup-box select {
+  width: 100%; padding: 12px; margin: 12px 0; border-radius: 8px; border: none; font-size: 16px;
+}
+.setup-box button, #ackBtn {
+  width: 100%; padding: 14px; border-radius: 8px; border: none; background: #2563eb;
+  color: white; font-weight: 600; font-size: 16px;
+}
+.hidden { display: none; }
+
+.status-badge {
+  padding: 40px 20px; border-radius: 16px; font-size: 24px; font-weight: 700; margin-bottom: 16px;
+}
+.status-badge.available { background: #059669; }
+.status-badge.en-route { background: #d97706; }
+.id-label { color: #94a3b8; margin-bottom: 16px; }
+.assignment-card {
+  background: #1e293b; border: 2px solid #dc2626; border-radius: 12px; padding: 20px; text-align: left;
+}
+.gps-note { color: #64748b; font-size: 13px; margin-top: 20px; }
+
+.idle-note { color: #64748b; }
+.incoming-card {
+  background: #1e293b; border: 2px solid #059669; border-radius: 12px; padding: 20px; text-align: left; margin-top: 16px;
+}
+
+/* Dispatcher */
+.dispatcher-page { padding: 0; }
+.dispatch-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 20px; background: #1e293b; border-bottom: 1px solid #334155;
+}
+.dispatch-controls button {
+  margin-left: 8px; padding: 10px 16px; border-radius: 8px; border: none;
+  background: #2563eb; color: white; font-weight: 600; cursor: pointer;
+}
+.danger-btn { background: #dc2626 !important; }
+.dispatch-body { display: flex; height: calc(100vh - 60px); }
+#map { flex: 2; }
+.log-panel { flex: 1; background: #0f172a; padding: 16px; overflow-y: auto; border-left: 1px solid #334155; }
+.log-panel h3 { margin-top: 0; }
+#logFeed div { padding: 8px; border-bottom: 1px solid #1e293b; font-size: 13px; color: #cbd5e1; }
