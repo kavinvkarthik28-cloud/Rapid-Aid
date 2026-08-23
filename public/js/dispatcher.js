@@ -2,8 +2,10 @@ const socket = io({ transports: ["polling"] });
 
 // Coimbatore default center
 const map = L.map("map").setView([11.0168, 76.9558], 13);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution: "© OpenStreetMap contributors",
+L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+  attribution: "© OpenStreetMap contributors, © CartoDB",
+  subdomains: "abcd",
+  maxZoom: 20
 }).addTo(map);
 
 const ambulanceMarkers = {};
