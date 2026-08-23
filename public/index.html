@@ -3,17 +3,443 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>RapidAid</title>
+<title>RapidAid — Adaptive Disaster Response</title>
+<meta name="description" content="RapidAid is an AI-powered disaster response coordination platform connecting ambulances, hospitals and dispatchers in real time." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800;900&display=swap" />
 <link rel="stylesheet" href="css/style.css" />
+<style>
+  /* ── LANDING RESET ── */
+  body.landing {
+    background: #030712;
+    overflow: hidden;
+    height: 100vh;
+    display: block;
+  }
+
+  /* ── MESH BACKGROUND ── */
+  .hero-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .hero-bg::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    left: -20%;
+    width: 80vw;
+    height: 80vw;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 65%);
+    animation: float1 18s ease-in-out infinite alternate;
+  }
+  .hero-bg::after {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    right: -15%;
+    width: 70vw;
+    height: 70vw;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 65%);
+    animation: float2 22s ease-in-out infinite alternate;
+  }
+  .hero-bg-extra {
+    position: absolute;
+    top: 40%;
+    left: 60%;
+    width: 40vw;
+    height: 40vw;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 65%);
+    animation: float3 15s ease-in-out infinite alternate;
+  }
+
+  @keyframes float1 {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(5%, 8%) scale(1.1); }
+  }
+  @keyframes float2 {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(-6%, -4%) scale(1.08); }
+  }
+  @keyframes float3 {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(4%, 6%) scale(0.95); }
+  }
+
+  /* ── GRID OVERLAY ── */
+  .hero-grid {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at center, black 20%, transparent 80%);
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100vh;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 48px;
+    gap: 60px;
+  }
+
+  /* ── LEFT: CONTENT ── */
+  .hero-left {
+    opacity: 0;
+    animation: slideLeft 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s forwards;
+  }
+
+  @keyframes slideLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(59,130,246,0.12);
+    border: 1px solid rgba(59,130,246,0.3);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #60a5fa;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 28px;
+  }
+  .hero-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #60a5fa;
+    animation: blinkDot 1.5s infinite;
+  }
+  @keyframes blinkDot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  .hero-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(42px, 5vw, 68px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 20px;
+    color: #f9fafb;
+  }
+  .hero-title .gradient-word {
+    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #34d399 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-desc {
+    font-size: 17px;
+    line-height: 1.7;
+    color: #9ca3af;
+    max-width: 440px;
+    margin-bottom: 44px;
+    font-weight: 400;
+  }
+
+  /* ── ROLE BUTTONS ── */
+  .role-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 380px;
+  }
+
+  .role-btn-new {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 24px;
+    border-radius: 16px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    color: white;
+    border: 1px solid transparent;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .role-btn-new::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+    transform: translateX(-100%);
+    transition: 0.5s;
+  }
+  .role-btn-new:hover::before { transform: translateX(100%); }
+  .role-btn-new:hover {
+    transform: translateX(6px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.3);
+  }
+
+  .btn-icon {
+    font-size: 22px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .btn-text { display: flex; flex-direction: column; gap: 2px; }
+  .btn-label { font-size: 15px; font-weight: 700; }
+  .btn-sublabel { font-size: 12px; opacity: 0.65; font-weight: 400; }
+  .btn-arrow {
+    margin-left: auto;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: all 0.3s;
+    font-size: 18px;
+  }
+  .role-btn-new:hover .btn-arrow { opacity: 1; transform: translateX(0); }
+
+  .btn-ambulance {
+    background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(185,28,28,0.1));
+    border-color: rgba(239,68,68,0.25);
+  }
+  .btn-ambulance .btn-icon { background: rgba(239,68,68,0.2); }
+  .btn-ambulance:hover { border-color: rgba(239,68,68,0.6); box-shadow: 0 8px 24px rgba(239,68,68,0.2); }
+
+  .btn-hospital {
+    background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(4,120,87,0.1));
+    border-color: rgba(16,185,129,0.25);
+  }
+  .btn-hospital .btn-icon { background: rgba(16,185,129,0.2); }
+  .btn-hospital:hover { border-color: rgba(16,185,129,0.6); box-shadow: 0 8px 24px rgba(16,185,129,0.2); }
+
+  .btn-dispatcher {
+    background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(29,78,216,0.1));
+    border-color: rgba(59,130,246,0.25);
+  }
+  .btn-dispatcher .btn-icon { background: rgba(59,130,246,0.2); }
+  .btn-dispatcher:hover { border-color: rgba(59,130,246,0.6); box-shadow: 0 8px 24px rgba(59,130,246,0.2); }
+
+  /* ── RIGHT: LIVE PREVIEW PANEL ── */
+  .hero-right {
+    opacity: 0;
+    animation: slideRight 0.9s cubic-bezier(0.16,1,0.3,1) 0.25s forwards;
+  }
+
+  @keyframes slideRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .preview-panel {
+    background: rgba(17,24,39,0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+  }
+
+  .preview-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-red { background: #ef4444; }
+  .dot-yellow { background: #f59e0b; }
+  .dot-green { background: #10b981; }
+  .preview-title-bar {
+    margin-left: 8px;
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .preview-stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .stat-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 16px;
+  }
+  .stat-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label { font-size: 12px; color: #6b7280; font-weight: 500; }
+  .stat-green { color: #34d399; }
+  .stat-blue  { color: #60a5fa; }
+  .stat-red   { color: #f87171; }
+  .stat-amber { color: #fbbf24; }
+
+  .preview-log {
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    padding: 14px;
+    font-family: 'Inter', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+  .log-line { color: #6b7280; }
+  .log-line.active { color: #34d399; }
+  .log-line.info { color: #60a5fa; }
+  .log-line.warn { color: #fbbf24; }
+
+  .log-cursor {
+    display: inline-block;
+    width: 7px;
+    height: 13px;
+    background: #34d399;
+    border-radius: 2px;
+    animation: blink 1s step-end infinite;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 860px) {
+    .hero {
+      grid-template-columns: 1fr;
+      padding: 40px 24px;
+      height: auto;
+      min-height: 100vh;
+      overflow-y: auto;
+    }
+    .hero-right { display: none; }
+    body.landing { overflow: auto; }
+  }
+</style>
 </head>
 <body class="landing">
-  <div class="bg-glow"></div>
-  <div class="landing-card fade-in-up">
-    <h1>RapidAid</h1>
-    <p class="subtitle">Adaptive Disaster Response Coordination — Team 11</p>
-    <a class="role-btn ambulance-btn" href="ambulance.html">🚑 I'm an Ambulance</a>
-    <a class="role-btn hospital-btn" href="hospital.html">🏥 I'm a Hospital</a>
-    <a class="role-btn dispatcher-btn" href="dispatcher.html">🖥️ Dispatcher View</a>
+
+  <!-- Mesh Background -->
+  <div class="hero-bg"><div class="hero-bg-extra"></div></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero">
+
+    <!-- LEFT: Headline + role buttons -->
+    <div class="hero-left">
+      <div class="hero-badge">AI-Powered Response System</div>
+
+      <h1 class="hero-title">
+        Rapid.<br>
+        Smart.<br>
+        <span class="gradient-word">RapidAid.</span>
+      </h1>
+
+      <p class="hero-desc">
+        Real-time disaster coordination powered by AI — connecting dispatchers, ambulances, and hospitals instantly to save lives.
+      </p>
+
+      <nav class="role-buttons">
+        <a class="role-btn-new btn-ambulance" href="ambulance.html">
+          <div class="btn-icon">🚑</div>
+          <div class="btn-text">
+            <span class="btn-label">I'm an Ambulance</span>
+            <span class="btn-sublabel">Sign in to start streaming GPS</span>
+          </div>
+          <span class="btn-arrow">→</span>
+        </a>
+
+        <a class="role-btn-new btn-hospital" href="hospital.html">
+          <div class="btn-icon">🏥</div>
+          <div class="btn-text">
+            <span class="btn-label">I'm a Hospital</span>
+            <span class="btn-sublabel">Monitor incoming patient alerts</span>
+          </div>
+          <span class="btn-arrow">→</span>
+        </a>
+
+        <a class="role-btn-new btn-dispatcher" href="dispatcher.html">
+          <div class="btn-icon">🖥️</div>
+          <div class="btn-text">
+            <span class="btn-label">Dispatcher View</span>
+            <span class="btn-sublabel">Live map, incidents &amp; AI reasoning</span>
+          </div>
+          <span class="btn-arrow">→</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- RIGHT: Animated preview panel -->
+    <div class="hero-right">
+      <div class="preview-panel">
+        <div class="preview-header">
+          <div class="preview-dot dot-red"></div>
+          <div class="preview-dot dot-yellow"></div>
+          <div class="preview-dot dot-green"></div>
+          <span class="preview-title-bar">Live System Status</span>
+        </div>
+
+        <div class="preview-stat-grid">
+          <div class="stat-card">
+            <div class="stat-value stat-green">3</div>
+            <div class="stat-label">Ambulances Active</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value stat-blue">2</div>
+            <div class="stat-label">Hospitals Online</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value stat-amber">1</div>
+            <div class="stat-label">Open Incident</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value stat-red">0.3s</div>
+            <div class="stat-label">Avg. Assign Time</div>
+          </div>
+        </div>
+
+        <div class="preview-log">
+          <div class="log-line active">✓ CSP solution found — A2 → Amrita Hospital</div>
+          <div class="log-line info">→ Incident INC4 reported (severity 8)</div>
+          <div class="log-line warn">⚠ Road to City General blocked — replanning</div>
+          <div class="log-line">Ambulance A1 joined (simulated GPS)</div>
+          <div class="log-line active">✓ Replanned: A2 → St. Mary's Medical<span class="log-cursor"></span></div>
+        </div>
+      </div>
+    </div>
+
   </div>
+
 </body>
 </html>
