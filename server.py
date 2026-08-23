@@ -324,4 +324,4 @@ def handle_disconnect():
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
     print(f"Starting server on http://localhost:{PORT}")
-    socketio.run(app, host='0.0.0.0', port=PORT, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, host='0.0.0.0', port=PORT, debug=False, allow_unsafe_werkzeug=True)
