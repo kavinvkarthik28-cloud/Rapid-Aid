@@ -10,8 +10,8 @@ this is deliberate, so the plumbing is provable *before* the real CSP/A*/KB logi
 
 ## How to run it (on your laptop)
 ```
-npm install
-node server.js
+pip install -r requirements.txt
+python server.py
 ```
 Server starts at http://localhost:3000
 
@@ -27,7 +27,7 @@ If phones can't reach your laptop, your WiFi may have client isolation enabled �
 see the Risks section in the project blueprint doc for the fallback (hotspot or ngrok).
 
 ## Where the real AI goes
-Open `server.js` and find `selectBestAmbulanceAndHospital()`. Replace the naive
+Open `server.py` and find `selectBestAmbulanceAndHospital()`. Replace the naive
 distance sort with:
 - Real CSP filtering (capacity, compatibility constraints)
 - A* over the real Coimbatore road graph (OSMnx-extracted) instead of straight-line distance
@@ -35,7 +35,7 @@ distance sort with:
 - Hook the "Simulate Road Block" button to trigger actual replanning
 
 ## File map
-- `server.js` — backend, all AI/decision logic lives here
+- `server.py` — backend, all AI/decision logic lives here
 - `public/index.html` — landing/role select
 - `public/dispatcher.html` + `js/dispatcher.js` — map, incident trigger, reasoning log
 - `public/ambulance.html` + `js/ambulance.js` — GPS streaming, assignment alert

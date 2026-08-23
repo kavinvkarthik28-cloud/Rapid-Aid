@@ -18,3 +18,10 @@ npm-debug.log*
 
 # Extracted road graph data (large file, regenerate with extract_graph.py instead of committing)
 coimbatore_graph.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+ENV/
