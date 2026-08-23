@@ -436,7 +436,7 @@ h2 {
 #map {
   flex: 2.2;
   height: 100%;
-  background: #0d1117; /* Matches dark tiles background */
+  background: #e5e3df; /* Matches Voyager tile background */
 }
 
 /* --- REASONING LOG PANEL --- */
