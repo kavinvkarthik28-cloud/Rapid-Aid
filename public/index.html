@@ -10,436 +10,443 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800;900&display=swap" />
 <link rel="stylesheet" href="css/style.css" />
 <style>
-  /* ── LANDING RESET ── */
   body.landing {
     background: #030712;
-    overflow: hidden;
-    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: auto;
     display: block;
+    scroll-behavior: smooth;
   }
 
-  /* ── MESH BACKGROUND ── */
+  /* ─── AMBIENT BACKGROUND ─── */
   .hero-bg {
     position: fixed;
     inset: 0;
     z-index: 0;
-    overflow: hidden;
+    pointer-events: none;
   }
-  .hero-bg::before {
-    content: '';
+  .blob {
     position: absolute;
-    top: -30%;
-    left: -20%;
-    width: 80vw;
-    height: 80vw;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 65%);
-    animation: float1 18s ease-in-out infinite alternate;
+    filter: blur(90px);
+    opacity: 0.55;
   }
-  .hero-bg::after {
-    content: '';
-    position: absolute;
-    bottom: -20%;
-    right: -15%;
-    width: 70vw;
-    height: 70vw;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 65%);
-    animation: float2 22s ease-in-out infinite alternate;
+  .blob-1 {
+    width: 70vw; height: 70vw;
+    top: -25%; left: -20%;
+    background: radial-gradient(circle, rgba(59,130,246,0.22) 0%, transparent 70%);
+    animation: blobMove1 20s ease-in-out infinite alternate;
   }
-  .hero-bg-extra {
-    position: absolute;
-    top: 40%;
-    left: 60%;
-    width: 40vw;
-    height: 40vw;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(16,185,129,0.1) 0%, transparent 65%);
-    animation: float3 15s ease-in-out infinite alternate;
+  .blob-2 {
+    width: 55vw; height: 55vw;
+    bottom: -20%; right: -15%;
+    background: radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%);
+    animation: blobMove2 24s ease-in-out infinite alternate;
   }
+  .blob-3 {
+    width: 40vw; height: 40vw;
+    top: 45%; left: 55%;
+    background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%);
+    animation: blobMove3 16s ease-in-out infinite alternate;
+  }
+  @keyframes blobMove1 { from { transform: translate(0,0) scale(1); } to { transform: translate(6%,8%) scale(1.1); } }
+  @keyframes blobMove2 { from { transform: translate(0,0) scale(1); } to { transform: translate(-5%,-6%) scale(1.08); } }
+  @keyframes blobMove3 { from { transform: translate(0,0) scale(1); } to { transform: translate(3%,5%) scale(0.92); } }
 
-  @keyframes float1 {
-    from { transform: translate(0, 0) scale(1); }
-    to   { transform: translate(5%, 8%) scale(1.1); }
-  }
-  @keyframes float2 {
-    from { transform: translate(0, 0) scale(1); }
-    to   { transform: translate(-6%, -4%) scale(1.08); }
-  }
-  @keyframes float3 {
-    from { transform: translate(0, 0) scale(1); }
-    to   { transform: translate(4%, 6%) scale(0.95); }
-  }
-
-  /* ── GRID OVERLAY ── */
   .hero-grid {
     position: fixed;
     inset: 0;
     z-index: 0;
     background-image:
-      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse at center, black 20%, transparent 80%);
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 56px 56px;
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
   }
 
-  /* ── MAIN LAYOUT ── */
-  .hero {
+  /* ─── SECTION 1: FULL SCREEN HERO ─── */
+  .section-hero {
     position: relative;
     z-index: 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    height: 100vh;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 48px;
-    gap: 60px;
-  }
-
-  /* ── LEFT: CONTENT ── */
-  .hero-left {
-    opacity: 0;
-    animation: slideLeft 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s forwards;
-  }
-
-  @keyframes slideLeft {
-    from { opacity: 0; transform: translateX(-30px); }
-    to   { opacity: 1; transform: translateX(0); }
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px 40px;
   }
 
   .hero-badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(59,130,246,0.12);
+    background: rgba(59,130,246,0.1);
     border: 1px solid rgba(59,130,246,0.3);
     border-radius: 100px;
-    padding: 6px 16px;
+    padding: 6px 18px;
     font-size: 12px;
     font-weight: 600;
     color: #60a5fa;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    margin-bottom: 28px;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.1s forwards;
   }
-  .hero-badge::before {
-    content: '';
-    width: 6px;
-    height: 6px;
+  .hero-badge .pulse-dot {
+    width: 7px; height: 7px;
     border-radius: 50%;
     background: #60a5fa;
-    animation: blinkDot 1.5s infinite;
+    animation: pulseDot 1.5s infinite;
   }
-  @keyframes blinkDot {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
+  @keyframes pulseDot {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.3; transform:scale(1.5); }
   }
 
   .hero-title {
     font-family: 'Outfit', sans-serif;
-    font-size: clamp(42px, 5vw, 68px);
+    font-size: clamp(52px, 8vw, 96px);
     font-weight: 900;
-    line-height: 1.05;
-    letter-spacing: -2px;
-    margin-bottom: 20px;
+    line-height: 1;
+    letter-spacing: -3px;
     color: #f9fafb;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.25s forwards;
   }
-  .hero-title .gradient-word {
-    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #34d399 100%);
+  .hero-title .word-1 { display: block; }
+  .hero-title .word-2 {
+    display: block;
+    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 45%, #34d399 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  .hero-desc {
-    font-size: 17px;
-    line-height: 1.7;
+  .hero-tagline {
+    font-size: clamp(16px, 2vw, 19px);
     color: #9ca3af;
-    max-width: 440px;
-    margin-bottom: 44px;
+    max-width: 580px;
+    line-height: 1.7;
+    margin-bottom: 48px;
     font-weight: 400;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.4s forwards;
   }
 
-  /* ── ROLE BUTTONS ── */
-  .role-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    max-width: 380px;
-  }
-
-  .role-btn-new {
+  /* Stat pills */
+  .stat-pills {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 18px 24px;
-    border-radius: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 64px;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.55s forwards;
+  }
+  .stat-pill {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 100px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #d1d5db;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .stat-pill span { font-weight: 700; }
+  .pill-green span { color: #34d399; }
+  .pill-blue span  { color: #60a5fa; }
+  .pill-amber span { color: #fbbf24; }
+
+  /* Scroll CTA */
+  .scroll-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    opacity: 0;
+    animation: fadeUp 0.7s 0.7s forwards;
+    transition: opacity 0.3s;
     text-decoration: none;
+  }
+  .scroll-cta:hover { opacity: 0.7; }
+  .scroll-cta-label {
+    font-size: 13px;
     font-weight: 600;
+    color: #6b7280;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .scroll-arrow {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    color: #9ca3af;
+    animation: bounceArrow 2s ease-in-out infinite;
+  }
+  @keyframes bounceArrow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  /* ─── SECTION 2: ROLE SELECTION ─── */
+  .section-roles {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 24px 100px;
+  }
+
+  .roles-heading {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: #f9fafb;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .roles-sub {
     font-size: 16px;
-    color: white;
-    border: 1px solid transparent;
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    color: #6b7280;
+    margin-bottom: 56px;
+    text-align: center;
+  }
+
+  .role-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 960px;
+    width: 100%;
+  }
+
+  .role-card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    background: rgba(17,24,39,0.55);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 24px;
+    padding: 36px 28px;
+    transition: all 0.35s cubic-bezier(0.25,1,0.5,1);
     position: relative;
     overflow: hidden;
   }
-  .role-btn-new::before {
+  .role-card::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
-    transform: translateX(-100%);
-    transition: 0.5s;
-  }
-  .role-btn-new:hover::before { transform: translateX(100%); }
-  .role-btn-new:hover {
-    transform: translateX(6px);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.3);
-  }
-
-  .btn-icon {
-    font-size: 22px;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    flex-shrink: 0;
-  }
-  .btn-text { display: flex; flex-direction: column; gap: 2px; }
-  .btn-label { font-size: 15px; font-weight: 700; }
-  .btn-sublabel { font-size: 12px; opacity: 0.65; font-weight: 400; }
-  .btn-arrow {
-    margin-left: auto;
     opacity: 0;
-    transform: translateX(-6px);
-    transition: all 0.3s;
-    font-size: 18px;
-  }
-  .role-btn-new:hover .btn-arrow { opacity: 1; transform: translateX(0); }
-
-  .btn-ambulance {
-    background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(185,28,28,0.1));
-    border-color: rgba(239,68,68,0.25);
-  }
-  .btn-ambulance .btn-icon { background: rgba(239,68,68,0.2); }
-  .btn-ambulance:hover { border-color: rgba(239,68,68,0.6); box-shadow: 0 8px 24px rgba(239,68,68,0.2); }
-
-  .btn-hospital {
-    background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(4,120,87,0.1));
-    border-color: rgba(16,185,129,0.25);
-  }
-  .btn-hospital .btn-icon { background: rgba(16,185,129,0.2); }
-  .btn-hospital:hover { border-color: rgba(16,185,129,0.6); box-shadow: 0 8px 24px rgba(16,185,129,0.2); }
-
-  .btn-dispatcher {
-    background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(29,78,216,0.1));
-    border-color: rgba(59,130,246,0.25);
-  }
-  .btn-dispatcher .btn-icon { background: rgba(59,130,246,0.2); }
-  .btn-dispatcher:hover { border-color: rgba(59,130,246,0.6); box-shadow: 0 8px 24px rgba(59,130,246,0.2); }
-
-  /* ── RIGHT: LIVE PREVIEW PANEL ── */
-  .hero-right {
-    opacity: 0;
-    animation: slideRight 0.9s cubic-bezier(0.16,1,0.3,1) 0.25s forwards;
-  }
-
-  @keyframes slideRight {
-    from { opacity: 0; transform: translateX(30px); }
-    to   { opacity: 1; transform: translateX(0); }
-  }
-
-  .preview-panel {
-    background: rgba(17,24,39,0.6);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.08);
+    transition: opacity 0.35s;
     border-radius: 24px;
-    padding: 28px;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.4);
   }
+  .role-card:hover { transform: translateY(-8px); }
 
-  .preview-header {
+  /* Ambulance */
+  .card-ambulance::before { background: radial-gradient(circle at top left, rgba(239,68,68,0.12), transparent 60%); }
+  .card-ambulance:hover { border-color: rgba(239,68,68,0.4); box-shadow: 0 20px 40px rgba(239,68,68,0.15); }
+  .card-ambulance:hover::before { opacity: 1; }
+
+  /* Hospital */
+  .card-hospital::before { background: radial-gradient(circle at top left, rgba(16,185,129,0.12), transparent 60%); }
+  .card-hospital:hover { border-color: rgba(16,185,129,0.4); box-shadow: 0 20px 40px rgba(16,185,129,0.15); }
+  .card-hospital:hover::before { opacity: 1; }
+
+  /* Dispatcher */
+  .card-dispatcher::before { background: radial-gradient(circle at top left, rgba(59,130,246,0.12), transparent 60%); }
+  .card-dispatcher:hover { border-color: rgba(59,130,246,0.4); box-shadow: 0 20px 40px rgba(59,130,246,0.15); }
+  .card-dispatcher:hover::before { opacity: 1; }
+
+  .card-icon-wrap {
+    width: 60px; height: 60px;
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    margin-bottom: 24px;
+  }
+  .icon-red   { background: rgba(239,68,68,0.15); }
+  .icon-green { background: rgba(16,185,129,0.15); }
+  .icon-blue  { background: rgba(59,130,246,0.15); }
+
+  .card-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #f9fafb;
+    margin-bottom: 10px;
+  }
+  .card-desc {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.65;
+    flex: 1;
+    margin-bottom: 28px;
+  }
+  .card-features {
+    list-style: none;
+    margin-bottom: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .card-features li {
+    font-size: 13px;
+    color: #9ca3af;
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    gap: 8px;
   }
-  .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
-  .dot-red { background: #ef4444; }
-  .dot-yellow { background: #f59e0b; }
-  .dot-green { background: #10b981; }
-  .preview-title-bar {
-    margin-left: 8px;
-    font-size: 13px;
-    color: #6b7280;
-    font-weight: 500;
-  }
+  .card-features li::before { content: '✓'; font-weight: 700; font-size: 12px; }
+  .feat-red li::before   { color: #f87171; }
+  .feat-green li::before { color: #34d399; }
+  .feat-blue li::before  { color: #60a5fa; }
 
-  .preview-stat-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-
-  .stat-card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 14px;
-    padding: 16px;
-  }
-  .stat-value {
-    font-family: 'Outfit', sans-serif;
-    font-size: 28px;
-    font-weight: 800;
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-  .stat-label { font-size: 12px; color: #6b7280; font-weight: 500; }
-  .stat-green { color: #34d399; }
-  .stat-blue  { color: #60a5fa; }
-  .stat-red   { color: #f87171; }
-  .stat-amber { color: #fbbf24; }
-
-  .preview-log {
-    background: rgba(0,0,0,0.3);
+  .card-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
     border-radius: 12px;
-    padding: 14px;
-    font-family: 'Inter', monospace;
-    font-size: 12px;
-    line-height: 1.8;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: auto;
+    transition: all 0.3s;
   }
-  .log-line { color: #6b7280; }
-  .log-line.active { color: #34d399; }
-  .log-line.info { color: #60a5fa; }
-  .log-line.warn { color: #fbbf24; }
+  .cta-red   { background: rgba(239,68,68,0.12); color: #f87171; }
+  .cta-green { background: rgba(16,185,129,0.12); color: #34d399; }
+  .cta-blue  { background: rgba(59,130,246,0.12); color: #60a5fa; }
+  .role-card:hover .card-cta { filter: brightness(1.3); }
+  .cta-arrow { font-size: 18px; transition: transform 0.3s; }
+  .role-card:hover .cta-arrow { transform: translateX(4px); }
 
-  .log-cursor {
-    display: inline-block;
-    width: 7px;
-    height: 13px;
-    background: #34d399;
-    border-radius: 2px;
-    animation: blink 1s step-end infinite;
-    vertical-align: middle;
-    margin-left: 4px;
-  }
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(20px); }
+    to   { opacity:1; transform:translateY(0); }
   }
 
-  /* ── RESPONSIVE ── */
-  @media (max-width: 860px) {
-    .hero {
-      grid-template-columns: 1fr;
-      padding: 40px 24px;
-      height: auto;
-      min-height: 100vh;
-      overflow-y: auto;
-    }
-    .hero-right { display: none; }
-    body.landing { overflow: auto; }
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 760px) {
+    .role-cards { grid-template-columns: 1fr; max-width: 440px; }
+    .stat-pills { gap: 8px; }
   }
 </style>
 </head>
 <body class="landing">
 
-  <!-- Mesh Background -->
-  <div class="hero-bg"><div class="hero-bg-extra"></div></div>
+  <!-- Ambient Background -->
+  <div class="hero-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
   <div class="hero-grid"></div>
 
-  <div class="hero">
+  <!-- ── SECTION 1: HERO ── -->
+  <section class="section-hero" id="hero">
 
-    <!-- LEFT: Headline + role buttons -->
-    <div class="hero-left">
-      <div class="hero-badge">AI-Powered Response System</div>
-
-      <h1 class="hero-title">
-        Rapid.<br>
-        Smart.<br>
-        <span class="gradient-word">RapidAid.</span>
-      </h1>
-
-      <p class="hero-desc">
-        Real-time disaster coordination powered by AI — connecting dispatchers, ambulances, and hospitals instantly to save lives.
-      </p>
-
-      <nav class="role-buttons">
-        <a class="role-btn-new btn-ambulance" href="ambulance.html">
-          <div class="btn-icon">🚑</div>
-          <div class="btn-text">
-            <span class="btn-label">I'm an Ambulance</span>
-            <span class="btn-sublabel">Sign in to start streaming GPS</span>
-          </div>
-          <span class="btn-arrow">→</span>
-        </a>
-
-        <a class="role-btn-new btn-hospital" href="hospital.html">
-          <div class="btn-icon">🏥</div>
-          <div class="btn-text">
-            <span class="btn-label">I'm a Hospital</span>
-            <span class="btn-sublabel">Monitor incoming patient alerts</span>
-          </div>
-          <span class="btn-arrow">→</span>
-        </a>
-
-        <a class="role-btn-new btn-dispatcher" href="dispatcher.html">
-          <div class="btn-icon">🖥️</div>
-          <div class="btn-text">
-            <span class="btn-label">Dispatcher View</span>
-            <span class="btn-sublabel">Live map, incidents &amp; AI reasoning</span>
-          </div>
-          <span class="btn-arrow">→</span>
-        </a>
-      </nav>
+    <div class="hero-badge">
+      <div class="pulse-dot"></div>
+      AI-Powered Response System
     </div>
 
-    <!-- RIGHT: Animated preview panel -->
-    <div class="hero-right">
-      <div class="preview-panel">
-        <div class="preview-header">
-          <div class="preview-dot dot-red"></div>
-          <div class="preview-dot dot-yellow"></div>
-          <div class="preview-dot dot-green"></div>
-          <span class="preview-title-bar">Live System Status</span>
-        </div>
+    <h1 class="hero-title">
+      <span class="word-1">Disaster Response,</span>
+      <span class="word-2">Reimagined.</span>
+    </h1>
 
-        <div class="preview-stat-grid">
-          <div class="stat-card">
-            <div class="stat-value stat-green">3</div>
-            <div class="stat-label">Ambulances Active</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value stat-blue">2</div>
-            <div class="stat-label">Hospitals Online</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value stat-amber">1</div>
-            <div class="stat-label">Open Incident</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value stat-red">0.3s</div>
-            <div class="stat-label">Avg. Assign Time</div>
-          </div>
-        </div>
+    <p class="hero-tagline">
+      Real-time coordination powered by AI — connecting dispatchers, ambulances, and hospitals in milliseconds. CSP matching. KB reasoning. Live GPS tracking.
+    </p>
 
-        <div class="preview-log">
-          <div class="log-line active">✓ CSP solution found — A2 → Amrita Hospital</div>
-          <div class="log-line info">→ Incident INC4 reported (severity 8)</div>
-          <div class="log-line warn">⚠ Road to City General blocked — replanning</div>
-          <div class="log-line">Ambulance A1 joined (simulated GPS)</div>
-          <div class="log-line active">✓ Replanned: A2 → St. Mary's Medical<span class="log-cursor"></span></div>
-        </div>
-      </div>
+    <div class="stat-pills">
+      <div class="stat-pill pill-green"><span>Real-Time</span> GPS Tracking</div>
+      <div class="stat-pill pill-blue"><span>AI</span> CSP Assignment</div>
+      <div class="stat-pill pill-amber"><span>Instant</span> Road Replanning</div>
     </div>
 
-  </div>
+    <a class="scroll-cta" href="#roles">
+      <span class="scroll-cta-label">Choose Your Role</span>
+      <div class="scroll-arrow">↓</div>
+    </a>
+
+  </section>
+
+  <!-- ── SECTION 2: ROLE CARDS ── -->
+  <section class="section-roles" id="roles">
+
+    <h2 class="roles-heading">Who are you?</h2>
+    <p class="roles-sub">Select your role to enter the live coordination system.</p>
+
+    <div class="role-cards">
+
+      <!-- Ambulance -->
+      <a class="role-card card-ambulance" href="ambulance.html" id="ambulance-card">
+        <div class="card-icon-wrap icon-red">🚑</div>
+        <div class="card-title">Ambulance</div>
+        <p class="card-desc">Stream your live GPS position and receive real-time dispatch assignments from the AI coordinator.</p>
+        <ul class="card-features feat-red">
+          <li>Live GPS streaming</li>
+          <li>Instant assignment alerts</li>
+          <li>Simulated fallback GPS</li>
+        </ul>
+        <div class="card-cta cta-red">
+          Enter as Ambulance
+          <span class="cta-arrow">→</span>
+        </div>
+      </a>
+
+      <!-- Hospital -->
+      <a class="role-card card-hospital" href="hospital.html" id="hospital-card">
+        <div class="card-icon-wrap icon-green">🏥</div>
+        <div class="card-title">Hospital</div>
+        <p class="card-desc">Monitor your bed capacity and receive real-time incoming patient notifications as the AI assigns cases.</p>
+        <ul class="card-features feat-green">
+          <li>Incoming patient alerts</li>
+          <li>Severity &amp; ambulance info</li>
+          <li>One-tap acknowledgement</li>
+        </ul>
+        <div class="card-cta cta-green">
+          Enter as Hospital
+          <span class="cta-arrow">→</span>
+        </div>
+      </a>
+
+      <!-- Dispatcher -->
+      <a class="role-card card-dispatcher" href="dispatcher.html" id="dispatcher-card">
+        <div class="card-icon-wrap icon-blue">🖥️</div>
+        <div class="card-title">Dispatcher</div>
+        <p class="card-desc">Monitor the live map, trigger incidents, view the AI reasoning log, and simulate road blocks for replanning.</p>
+        <ul class="card-features feat-blue">
+          <li>Live ambulance tracking</li>
+          <li>AI reasoning log</li>
+          <li>Road block simulation</li>
+        </ul>
+        <div class="card-cta cta-blue">
+          Open Dispatcher View
+          <span class="cta-arrow">→</span>
+        </div>
+      </a>
+
+    </div>
+
+  </section>
 
 </body>
 </html>
