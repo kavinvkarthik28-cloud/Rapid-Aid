@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RapidAid — Need Help</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="ambulance-page">
+  <div class="bg-glow"></div>
+
+  <div id="phoneStep" class="setup-box fade-in-up">
+    <h2>Verify Your Number</h2>
+    <p style="color:var(--text-muted); font-size:13px;">We verify your phone before accepting an SOS, to prevent fake reports.</p>
+    <input id="phoneInput" placeholder="10-digit phone number" autocomplete="off" maxlength="10" />
+    <button id="sendOtpBtn">Send OTP</button>
+    <p id="phoneError" style="color:#f87171; font-size:13px;"></p>
+  </div>
+
+  <div id="otpStep" class="setup-box fade-in-up hidden">
+    <h2>Enter OTP</h2>
+    <p style="color:var(--text-muted); font-size:13px;">Sent to your phone.</p>
+    <input id="otpInput" placeholder="6-digit OTP" autocomplete="off" maxlength="6" />
+    <button id="verifyOtpBtn">Verify</button>
+    <p id="otpError" style="color:#f87171; font-size:13px;"></p>
+  </div>
+
+  <div id="sosStep" class="setup-box fade-in-up hidden">
+    <h2>You're Verified</h2>
+    <input id="contactInput" placeholder="Emergency contact number (optional)" autocomplete="off" maxlength="10" />
+    <select id="severityInput">
+      <option value="9">Critical — life-threatening</option>
+      <option value="7" selected>Serious — needs urgent care</option>
+      <option value="4">Moderate</option>
+    </select>
+    <button id="sosBtn" style="background:#ef4444;">🚨 SEND SOS</button>
+    <p id="sosNote" style="color:var(--text-muted); font-size:13px;"></p>
+  </div>
+
+  <div id="waitingStep" class="status-screen hidden fade-in-up">
+    <div class="status-badge en-route">SOS SENT</div>
+    <p id="waitingMsg" style="color:var(--text-muted);">Waiting for an ambulance to be assigned…</p>
+  </div>
+
+  <div id="assignedStep" class="status-screen hidden fade-in-up">
+    <div class="status-badge available">AMBULANCE ASSIGNED</div>
+    <div class="assignment-card">
+      <p id="assignedHospital"></p>
+      <p id="assignedAmbulance"></p>
+      <p id="assignedEta"></p>
+    </div>
+    <p style="color:var(--text-muted); font-size:12px; margin-top:16px;">Your live location is shared only with the dispatcher and your assigned ambulance.</p>
+  </div>
+
+  <script src="js/socket.io.min.js"></script>
+  <script src="js/patient.js"></script>
+</body>
+</html>

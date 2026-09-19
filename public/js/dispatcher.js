@@ -2,7 +2,7 @@ const socket = io({ transports: ["polling"] });
 
 // Coimbatore default center
 const map = L.map("map").setView([11.0168, 76.9558], 13);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/dark_matter/{z}/{x}/{y}{r}.png", {
   attribution: "© OpenStreetMap contributors, © CartoDB",
   subdomains: "abcd",
   maxZoom: 20
@@ -10,9 +10,26 @@ L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r
 
 const ambulanceMarkers = {};
 const hospitalMarkers = {};
+const patientMarkers = {}; // incidentId -> marker, for privacy-scoped live patient tracking
 const knownAmbulanceIds = new Set();
 let pendingIncidentLatLng = null;
 let incidentMarker = null;
+let routeLines = [];
+
+// Register this dispatcher to receive privacy-scoped patient location
+// updates — only clients that explicitly join this room ever see them.
+socket.emit("dispatcher:join");
+
+function clearRoutes() {
+  routeLines.forEach((line) => map.removeLayer(line));
+  routeLines = [];
+}
+
+function drawRoute(latlngPairs, color) {
+  if (!latlngPairs || latlngPairs.length < 2) return;
+  const line = L.polyline(latlngPairs, { color, weight: 4, opacity: 0.75 }).addTo(map);
+  routeLines.push(line);
+}
 
 function fitToAllMarkers() {
   const allMarkers = [...Object.values(ambulanceMarkers), ...Object.values(hospitalMarkers)];
@@ -52,7 +69,7 @@ document.getElementById("blockRoadBtn").onclick = () => {
   socket.emit("demo:block-road");
 };
 
-socket.on("state:update", ({ ambulances, hospitals }) => {
+socket.on("state:update", ({ ambulances, hospitals, activeRoute }) => {
   let newAmbulanceAppeared = false;
 
   // ambulances
@@ -91,6 +108,24 @@ socket.on("state:update", ({ ambulances, hospitals }) => {
   // shows up, so an ambulance far from Coimbatore city center
   // (e.g. in Pollachi) is never silently off-screen.
   if (newAmbulanceAppeared) fitToAllMarkers();
+
+  if (activeRoute) {
+    clearRoutes();
+    drawRoute(activeRoute.ambPath, "#dc2626");
+    drawRoute(activeRoute.hospPath, "#2563eb");
+  }
+});
+
+// Live patient location — only arrives because this dispatcher
+// explicitly joined the privacy-scoped room above.
+socket.on("patient:location-update", ({ incidentId, lat, lng }) => {
+  if (patientMarkers[incidentId]) {
+    patientMarkers[incidentId].setLatLng([lat, lng]);
+  } else {
+    patientMarkers[incidentId] = L.marker([lat, lng], {
+      icon: L.divIcon({ className: "", html: "🧍", iconSize: [22, 22] }),
+    }).addTo(map).bindTooltip(`Patient — ${incidentId}`);
+  }
 });
 
 socket.on("log:event", (msg) => {

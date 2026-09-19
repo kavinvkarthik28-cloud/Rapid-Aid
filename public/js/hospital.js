@@ -3,13 +3,20 @@ let hospId = null;
 
 document.getElementById("joinBtn").onclick = () => {
   hospId = document.getElementById("hospIdInput").value;
-  socket.emit("hospital:join", { id: hospId });
+  const pin = document.getElementById("hospPinInput").value.trim();
+  socket.emit("hospital:join", { id: hospId, pin });
+};
 
+socket.on("hospital:join-ok", () => {
   document.getElementById("setup").classList.add("hidden");
   document.getElementById("mainScreen").classList.remove("hidden");
   document.getElementById("hospName").innerText =
     document.getElementById("hospIdInput").selectedOptions[0].text;
-};
+});
+
+socket.on("auth:error", (msg) => {
+  document.getElementById("hospAuthError").innerText = msg;
+});
 
 socket.on("hospital:incoming", ({ hospitalId, incident, ambulanceId }) => {
   if (hospitalId !== hospId) return; // not for this hospital

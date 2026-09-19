@@ -11,7 +11,9 @@
   <div id="setup" class="setup-box fade-in-up">
     <h2>Ambulance Sign-in</h2>
     <input id="ambIdInput" placeholder="Ambulance ID e.g. A1" autocomplete="off" />
+    <input id="ambPinInput" placeholder="PIN" type="password" autocomplete="off" maxlength="4" />
     <button id="joinBtn">Start Duty</button>
+    <p id="ambAuthError" style="color:#f87171; font-size:13px;"></p>
   </div>
 
   <div id="statusScreen" class="status-screen hidden fade-in-up">
@@ -21,6 +23,7 @@
       <h3>New Assignment</h3>
       <p id="assignIncident"></p>
       <p id="assignHospital"></p>
+      <button id="completeBtn">Mark Arrived / Complete Trip</button>
     </div>
     <p class="gps-note">Streaming live GPS…</p>
   </div>

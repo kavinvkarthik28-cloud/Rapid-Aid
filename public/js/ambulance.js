@@ -3,16 +3,22 @@ let ambId = null;
 
 function joinAsAmbulance() {
   ambId = document.getElementById("ambIdInput").value.trim();
-  if (!ambId) return alert("Enter an ambulance ID");
+  const pin = document.getElementById("ambPinInput").value.trim();
+  if (!ambId || !pin) return alert("Enter your ambulance ID and PIN");
 
-  socket.emit("ambulance:join", { id: ambId });
+  socket.emit("ambulance:join", { id: ambId, pin });
+}
 
+socket.on("ambulance:join-ok", () => {
   document.getElementById("setup").classList.add("hidden");
   document.getElementById("statusScreen").classList.remove("hidden");
   document.getElementById("idLabel").innerText = "Ambulance " + ambId;
-
   startGPS();
-}
+});
+
+socket.on("auth:error", (msg) => {
+  document.getElementById("ambAuthError").innerText = msg;
+});
 
 document.getElementById("joinBtn").onclick = joinAsAmbulance;
 
@@ -101,3 +107,11 @@ socket.on("assignment:new", ({ incident, hospital }) => {
   document.getElementById("assignHospital").innerText =
     `Destination: ${hospital.name}`;
 });
+
+document.getElementById("completeBtn").onclick = () => {
+  socket.emit("ambulance:complete", { id: ambId });
+  const badge = document.getElementById("statusBadge");
+  badge.innerText = "AVAILABLE";
+  badge.className = "status-badge available";
+  document.getElementById("assignmentCard").classList.add("hidden");
+};
