@@ -1,0 +1,401 @@
+/* ================================================
+   RAPID-AID AMBULANCE UNIT — ambulance.css
+   Modern animated dark glassmorphism styling
+   ================================================ */
+
+.ambulance-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #030712;
+  overflow-x: hidden;
+}
+
+/* ---- Header ---- */
+.role-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(3, 7, 18, 0.82);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-icon { font-size: 24px; }
+.brand-name {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  background: linear-gradient(135deg, #f87171, #fb923c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.role-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+/* ---- Wizard Outer Container ---- */
+.wizard-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 88px 20px 40px;
+  position: relative;
+}
+
+/* ---- Wizard Step ---- */
+.wizard-step {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 420px;
+}
+
+.wizard-step.active {
+  display: flex;
+  animation: stepEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.wizard-step.slide-exit {
+  display: flex;
+  animation: stepExit 0.28s cubic-bezier(0.4, 0, 1, 1) both;
+  pointer-events: none;
+}
+
+@keyframes stepEnter {
+  from { opacity: 0; transform: translateY(36px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+@keyframes stepExit {
+  from { opacity: 1; transform: translateY(0)    scale(1);    }
+  to   { opacity: 0; transform: translateY(-28px) scale(0.95); }
+}
+
+/* ---- Step Icons ---- */
+.step-icon {
+  font-size: 68px;
+  margin-bottom: 18px;
+  filter: drop-shadow(0 0 28px rgba(239, 68, 68, 0.4));
+  animation: iconFloat 3.5s ease-in-out infinite;
+}
+
+.amb-icon {
+  filter: drop-shadow(0 0 28px rgba(239, 68, 68, 0.4));
+}
+
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0px) rotate(-2deg); }
+  50%       { transform: translateY(-8px) rotate(2deg); }
+}
+
+/* ---- Typography ---- */
+.step-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.1;
+}
+
+.unit-title {
+  font-size: 26px;
+  margin-bottom: 6px;
+}
+
+.step-desc {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.65;
+  margin-bottom: 24px;
+  max-width: 340px;
+}
+
+/* ---- Form Fields ---- */
+.form-field {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field-input {
+  width: 100%;
+  padding: 15px 18px;
+  background: rgba(17, 24, 39, 0.65);
+  border: 1.5px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  color: var(--text-main);
+  font-size: 16px;
+  font-family: 'Outfit', sans-serif;
+  transition: all 0.25s;
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: #f87171;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.18);
+  background: rgba(17, 24, 39, 0.85);
+}
+
+.field-error {
+  color: #f87171;
+  font-size: 13px;
+  min-height: 22px;
+  margin-bottom: 12px;
+  align-self: flex-start;
+  transition: opacity 0.2s;
+}
+
+/* ---- Buttons ---- */
+.btn-primary {
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: transform 0.25s, box-shadow 0.25s, filter 0.25s;
+  box-shadow: 0 4px 22px rgba(239, 68, 68, 0.35);
+  margin-bottom: 12px;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px rgba(239, 68, 68, 0.5);
+  filter: brightness(1.1);
+}
+
+.btn-primary:active:not(:disabled) { transform: translateY(-1px); }
+
+.btn-icon {
+  font-size: 18px;
+  transition: transform 0.3s;
+}
+.btn-primary:hover:not(:disabled) .btn-icon { transform: translateX(5px); }
+
+/* ---- Status Ring & Duty Screen ---- */
+.status-ring {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.ring-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(16, 185, 129, 0.4);
+  animation: ringPulseAnim 2.8s ease-out infinite;
+}
+
+.ring-pulse.p2 {
+  animation-delay: 1.4s;
+}
+
+@keyframes ringPulseAnim {
+  0%   { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+.status-ring.en-route .ring-pulse {
+  border-color: rgba(245, 158, 11, 0.6);
+}
+
+.ring-center {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(17, 24, 39, 0.85);
+  border: 2px solid rgba(16, 185, 129, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  z-index: 2;
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.25);
+  transition: all 0.3s ease;
+}
+
+.status-ring.en-route .ring-center {
+  border-color: rgba(245, 158, 11, 0.5);
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+}
+
+.status-chip.available {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: var(--success);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+}
+
+.status-chip.en-route {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  color: var(--warning);
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.2);
+}
+
+/* ---- GPS Status Bar ---- */
+.gps-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(17, 24, 39, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  padding: 8px 18px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+.gps-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: dotPulseAnim 1.4s infinite;
+}
+
+.gps-dot.simulated {
+  background: var(--warning);
+}
+
+@keyframes dotPulseAnim {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.35; transform: scale(0.7); }
+}
+
+/* ---- Assignment Card ---- */
+.assignment-card-new {
+  width: 100%;
+  background: rgba(17, 24, 39, 0.9);
+  border: 1.5px solid rgba(245, 158, 11, 0.35);
+  border-radius: 18px;
+  padding: 22px;
+  margin-top: 10px;
+  box-shadow: 0 8px 32px rgba(245, 158, 11, 0.15);
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  text-align: left;
+}
+
+.assign-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.assign-icon { font-size: 20px; }
+
+.assign-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--warning);
+  letter-spacing: 0.3px;
+}
+
+.assign-row {
+  font-size: 14px;
+  color: var(--text-main);
+  padding: 8px 0;
+  line-height: 1.5;
+}
+
+.btn-complete {
+  width: 100%;
+  margin-top: 18px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.3);
+}
+
+.btn-complete:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45);
+  filter: brightness(1.1);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}

@@ -1,37 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>RapidAid — Hospital</title>
-<link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RapidAid — Hospital</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/hospital.css" />
 </head>
 <body class="hospital-page">
-  <div class="bg-glow"></div>
-  <div id="setup" class="setup-box fade-in-up">
-    <h2>Hospital Sign-in</h2>
-    <select id="hospIdInput">
-      <option value="H1">City General Hospital (H1)</option>
-      <option value="H2">Amrita Hospital (H2)</option>
-      <option value="H3">St. Mary's Medical Center (H3)</option>
-    </select>
-    <input id="hospPinInput" placeholder="PIN" type="password" autocomplete="off" maxlength="4" />
-    <button id="joinBtn">Go Live</button>
-    <p id="hospAuthError" style="color:#f87171; font-size:13px;"></p>
-  </div>
+  <div class="bg-glow hosp-glow"></div>
 
-  <div id="mainScreen" class="hospital-main hidden fade-in-up">
-    <h2 id="hospName"></h2>
-    <p class="idle-note" id="idleNote">No incoming patients</p>
-    <div id="incomingCard" class="incoming-card hidden">
-      <h3>🚑 Incoming Patient</h3>
-      <p><strong>Ambulance:</strong> <span id="incAmb"></span></p>
-      <p><strong>Severity:</strong> <span id="incSeverity"></span></p>
-      <p><strong>Note:</strong> <span id="incNote"></span></p>
-      <p><strong>Reported:</strong> <span id="incTime"></span></p>
-      <button id="ackBtn">Acknowledge & Prepare</button>
+  <!-- ── Header ── -->
+  <header class="role-header hosp-header">
+    <div class="brand">
+      <span class="brand-icon">🏥</span>
+      <span class="brand-name">RapidAid</span>
     </div>
-  </div>
+    <div class="role-chip hosp-chip">Hospital Portal</div>
+  </header>
+
+  <main class="wizard-container">
+
+    <!-- STEP 1 · Sign-in -->
+    <div id="setupStep" class="wizard-step active">
+      <div class="step-icon hosp-icon">🏥</div>
+      <h1 class="step-title">Hospital Sign-in</h1>
+      <p class="step-desc">Connect to the RapidAid dispatch network to receive incoming patient alerts in real time.</p>
+
+      <div class="form-field">
+        <label class="field-label">Select Hospital</label>
+        <select id="hospIdInput" class="field-input field-select">
+          <option value="H1">City General Hospital</option>
+          <option value="H2">Amrita Hospital</option>
+          <option value="H3">St. Mary's Medical Center</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="field-label">Staff PIN</label>
+        <input id="hospPinInput" class="field-input" placeholder="4-digit PIN" type="password" autocomplete="off" maxlength="4" inputmode="numeric" />
+      </div>
+      <p id="hospAuthError" class="field-error"></p>
+
+      <button id="joinBtn" class="btn-primary btn-hosp">
+        <span class="btn-text">Go Live</span>
+        <span class="btn-icon">→</span>
+      </button>
+    </div>
+
+    <!-- STEP 2 · Live Dashboard -->
+    <div id="mainStep" class="wizard-step">
+      <!-- Hospital identity -->
+      <div class="hosp-identity">
+        <div class="hosp-avatar">🏥</div>
+        <div>
+          <div class="hosp-name" id="hospName">Hospital Name</div>
+          <div class="hosp-live-badge">
+            <span class="live-dot"></span> LIVE
+          </div>
+        </div>
+      </div>
+
+      <!-- Idle state -->
+      <div id="idleState" class="idle-state">
+        <div class="idle-icon">📋</div>
+        <p class="idle-title">Standing by</p>
+        <p class="idle-sub">No incoming patients right now. You'll be alerted immediately on assignment.</p>
+      </div>
+
+      <!-- Incoming patient card — hidden until triggered -->
+      <div id="incomingCard" class="incoming-alert hidden">
+        <div class="alert-pulse-ring"></div>
+        <div class="alert-header">
+          <span class="alert-icon">🚨</span>
+          <span class="alert-title">INCOMING PATIENT</span>
+        </div>
+        <div class="alert-body">
+          <div class="alert-row">
+            <span class="alert-label">Ambulance</span>
+            <span class="alert-val" id="incAmb">—</span>
+          </div>
+          <div class="alert-row">
+            <span class="alert-label">Severity</span>
+            <span class="alert-val sev-val" id="incSeverity">—</span>
+          </div>
+          <div class="alert-row">
+            <span class="alert-label">Note</span>
+            <span class="alert-val" id="incNote">—</span>
+          </div>
+          <div class="alert-row">
+            <span class="alert-label">Reported</span>
+            <span class="alert-val" id="incTime">—</span>
+          </div>
+        </div>
+        <button id="ackBtn" class="btn-ack">
+          <span>✓</span> Acknowledge &amp; Prepare
+        </button>
+      </div>
+
+      <!-- Acknowledged state -->
+      <div id="ackState" class="ack-state hidden">
+        <div class="ack-check">✓</div>
+        <p class="ack-title">Team Alerted</p>
+        <p class="ack-sub">Staff and bed preparation confirmed. Awaiting next patient.</p>
+      </div>
+    </div>
+
+  </main>
 
   <script src="js/socket.io.min.js"></script>
   <script src="js/hospital.js"></script>

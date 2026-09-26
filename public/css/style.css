@@ -1,5 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 
+/* CRITICAL — must come first so all .hidden elements are invisible by default */
+.hidden { display: none !important; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  15%, 45%, 75% { transform: translateX(-7px); }
+  30%, 60%, 90% { transform: translateX(7px); }
+}
+.shake { animation: shake 0.55s cubic-bezier(.36,.07,.19,.97); }
+
+
+
 /* --- CSS VARIABLES & DESIGN SYSTEM --- */
 :root {
   --bg-color: #030712;

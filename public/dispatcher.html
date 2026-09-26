@@ -1,29 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>RapidAid — Dispatcher</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RapidAid — Dispatcher Dashboard</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dispatcher.css" />
 </head>
 <body class="dispatcher-page">
-  <div class="bg-glow"></div>
-  <div class="dispatch-header">
-    <h2>🖥️ RapidAid — Dispatcher Dashboard</h2>
-    <div class="dispatch-controls">
-      <button id="fitAllBtn">🔍 Fit All Markers</button>
-      <button id="incidentBtn">🚨 Report Incident (click map first)</button>
-      <button id="blockRoadBtn" class="danger-btn">⚠ Simulate Road Block</button>
+
+  <!-- ══════════════ HEADER ══════════════ -->
+  <header class="dispatch-header">
+    <div class="dh-brand">
+      <span class="dh-brand-icon">🖥️</span>
+      <div>
+        <div class="dh-brand-name">RapidAid Dispatch</div>
+        <div class="dh-brand-sub">Coimbatore Emergency Coordination</div>
+      </div>
     </div>
+
+    <!-- Live counters -->
+    <div class="dh-stats">
+      <div class="stat-pill" id="statAmbulances">
+        <span class="stat-icon">🚑</span>
+        <span class="stat-count" id="cntAmb">0</span>
+        <span class="stat-label">Units</span>
+      </div>
+      <div class="stat-pill" id="statHospitals">
+        <span class="stat-icon">🏥</span>
+        <span class="stat-count" id="cntHosp">0</span>
+        <span class="stat-label">Hospitals</span>
+      </div>
+      <div class="stat-pill incident-pill" id="statIncidents">
+        <span class="stat-icon">🚨</span>
+        <span class="stat-count" id="cntInc">0</span>
+        <span class="stat-label">Incidents</span>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="dispatch-controls">
+      <button id="fitAllBtn" class="ctrl-btn">
+        <span>⊕</span> Fit Map
+      </button>
+      <button id="incidentBtn" class="ctrl-btn accent-btn">
+        <span>🚨</span> Report Incident
+      </button>
+      <button id="blockRoadBtn" class="ctrl-btn danger-ctrl-btn">
+        <span>⚠</span> Road Block
+      </button>
+    </div>
+  </header>
+
+  <!-- ══════════════ BODY ══════════════ -->
+  <div class="dispatch-body">
+
+    <!-- Map takes main space -->
+    <div id="map"></div>
+
+    <!-- Right panel -->
+    <aside class="log-panel">
+
+      <!-- Incident form (shows when user clicks map) -->
+      <div id="incidentPanel" class="incident-panel hidden">
+        <div class="ip-header">
+          <span class="ip-icon">📍</span>
+          <span class="ip-title">New Incident</span>
+          <button class="ip-close" id="ipClose">✕</button>
+        </div>
+        <div class="ip-body">
+          <label class="ip-label">Severity</label>
+          <div class="sev-row" id="dispSevRow">
+            <div class="dsev-opt selected" data-value="9">🔴 Critical</div>
+            <div class="dsev-opt" data-value="7">🟠 Serious</div>
+            <div class="dsev-opt" data-value="4">🟡 Moderate</div>
+          </div>
+          <input type="hidden" id="dispSeverity" value="9" />
+          <label class="ip-label">Note</label>
+          <input id="dispNote" class="ip-input" placeholder="e.g. Road accident, 3 casualties" />
+          <button id="submitIncidentBtn" class="btn-incident">
+            <span>🚨</span> Dispatch Now
+          </button>
+        </div>
+      </div>
+
+      <!-- Click map hint -->
+      <div id="mapHint" class="map-hint">
+        <div class="hint-icon">🗺️</div>
+        <p>Click anywhere on the map to place an incident marker, then press <strong>Report Incident</strong>.</p>
+      </div>
+
+      <!-- Reasoning log -->
+      <div class="log-section">
+        <div class="log-header">
+          <span class="log-title">⚡ AI Reasoning Log</span>
+          <button class="log-clear" id="clearLogBtn">Clear</button>
+        </div>
+        <div id="logFeed" class="log-feed"></div>
+        <div id="logEmpty" class="log-empty">No events yet. Assign an incident to see AI reasoning.</div>
+      </div>
+
+    </aside>
   </div>
 
-  <div class="dispatch-body">
-    <div id="map"></div>
-    <div class="log-panel">
-      <h3>Reasoning Log</h3>
-      <div id="logFeed"></div>
-    </div>
+  <!-- Incident placed toast -->
+  <div id="incidentToast" class="incident-toast hidden">
+    📍 Incident placed — click <strong>Report Incident</strong> to dispatch
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

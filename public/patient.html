@@ -1,56 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>RapidAid — Need Help</title>
-<link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RapidAid — Need Help?</title>
+  <meta name="description" content="Send an emergency SOS with RapidAid. OTP-verified dispatch with live ambulance tracking." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/patient.css" />
 </head>
-<body class="ambulance-page">
+<body class="patient-page">
   <div class="bg-glow"></div>
 
-  <div id="phoneStep" class="setup-box fade-in-up">
-    <h2>Verify Your Number</h2>
-    <p style="color:var(--text-muted); font-size:13px;">We verify your phone before accepting an SOS, to prevent fake reports.</p>
-    <input id="phoneInput" placeholder="10-digit phone number" autocomplete="off" maxlength="10" />
-    <button id="sendOtpBtn">Send OTP</button>
-    <p id="phoneError" style="color:#f87171; font-size:13px;"></p>
-  </div>
-
-  <div id="otpStep" class="setup-box fade-in-up hidden">
-    <h2>Enter OTP</h2>
-    <p style="color:var(--text-muted); font-size:13px;">Sent to your phone.</p>
-    <input id="otpInput" placeholder="6-digit OTP" autocomplete="off" maxlength="6" />
-    <button id="verifyOtpBtn">Verify</button>
-    <p id="otpError" style="color:#f87171; font-size:13px;"></p>
-  </div>
-
-  <div id="sosStep" class="setup-box fade-in-up hidden">
-    <h2>You're Verified</h2>
-    <input id="contactInput" placeholder="Emergency contact number (optional)" autocomplete="off" maxlength="10" />
-    <select id="severityInput">
-      <option value="9">Critical — life-threatening</option>
-      <option value="7" selected>Serious — needs urgent care</option>
-      <option value="4">Moderate</option>
-    </select>
-    <button id="sosBtn" style="background:#ef4444;">🚨 SEND SOS</button>
-    <p id="sosNote" style="color:var(--text-muted); font-size:13px;"></p>
-  </div>
-
-  <div id="waitingStep" class="status-screen hidden fade-in-up">
-    <div class="status-badge en-route">SOS SENT</div>
-    <p id="waitingMsg" style="color:var(--text-muted);">Waiting for an ambulance to be assigned…</p>
-  </div>
-
-  <div id="assignedStep" class="status-screen hidden fade-in-up">
-    <div class="status-badge available">AMBULANCE ASSIGNED</div>
-    <div class="assignment-card">
-      <p id="assignedHospital"></p>
-      <p id="assignedAmbulance"></p>
-      <p id="assignedEta"></p>
+  <!-- ── Sticky top bar ── -->
+  <header class="patient-header">
+    <div class="brand">
+      <span class="brand-icon">🚑</span>
+      <span class="brand-name">RapidAid</span>
     </div>
-    <p style="color:var(--text-muted); font-size:12px; margin-top:16px;">Your live location is shared only with the dispatcher and your assigned ambulance.</p>
-  </div>
+    <div class="patient-progress-bar" title="Progress">
+      <div class="patient-progress-fill" id="progressFill"></div>
+    </div>
+  </header>
+
+  <!-- ── Wizard ── -->
+  <main class="wizard-container">
+
+    <!-- STEP 1 · Phone Verification -->
+    <div id="phoneStep" class="wizard-step active">
+      <div class="step-icon">🛡️</div>
+      <h1 class="step-title">Verify Your Number</h1>
+      <p class="step-desc">We verify your phone before accepting an SOS to prevent false alarms.</p>
+
+      <div class="input-group">
+        <span class="input-prefix">+91</span>
+        <input id="phoneInput" type="tel" placeholder="10-digit mobile" autocomplete="off"
+               maxlength="10" inputmode="numeric" />
+      </div>
+      <p id="phoneError" class="field-error"></p>
+
+      <button id="sendOtpBtn" class="btn-primary">
+        <span class="btn-text">Send OTP</span>
+        <span class="btn-icon">→</span>
+      </button>
+
+      <p class="secure-note">🔒 Your number is only used for verification and emergency dispatch</p>
+    </div>
+
+    <!-- STEP 2 · OTP -->
+    <div id="otpStep" class="wizard-step">
+      <div class="step-icon">🔐</div>
+      <h2 class="step-title">Enter OTP</h2>
+      <p class="step-desc" id="otpHint">We sent a 6-digit code to your number.</p>
+
+      <!-- Dev fallback banner -->
+      <div id="devOtpBanner" class="dev-banner" style="display:none;"></div>
+
+      <!-- Six individual digit boxes -->
+      <div class="otp-boxes" id="otpBoxes">
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" />
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" />
+      </div>
+      <!-- Hidden aggregate for socket.emit -->
+      <input id="otpInput" type="hidden" />
+
+      <p id="otpError" class="field-error"></p>
+
+      <button id="verifyOtpBtn" class="btn-primary" disabled>
+        <span class="btn-text">Verify Code</span>
+        <span class="btn-icon">✓</span>
+      </button>
+      <button id="changePhoneBtn" class="btn-ghost">← Change Phone Number</button>
+    </div>
+
+    <!-- STEP 3 · SOS Form -->
+    <div id="sosStep" class="wizard-step">
+      <div class="verified-badge">
+        <span class="verified-icon">✓</span>
+        Number Verified
+      </div>
+      <h2 class="step-title">Report Emergency</h2>
+      <p class="step-desc">Select the severity and we'll dispatch the best available ambulance.</p>
+
+      <!-- Severity cards -->
+      <div class="severity-selector" id="severitySelector">
+        <div class="severity-option" data-value="9">
+          <span class="sev-emoji">🔴</span>
+          <span class="sev-label">Critical</span>
+          <span class="sev-desc">Life-threatening</span>
+        </div>
+        <div class="severity-option selected" data-value="7">
+          <span class="sev-emoji">🟠</span>
+          <span class="sev-label">Serious</span>
+          <span class="sev-desc">Urgent care needed</span>
+        </div>
+        <div class="severity-option" data-value="4">
+          <span class="sev-emoji">🟡</span>
+          <span class="sev-label">Moderate</span>
+          <span class="sev-desc">Non-critical</span>
+        </div>
+      </div>
+      <input type="hidden" id="severityInput" value="7" />
+
+      <input id="contactInput" type="tel" placeholder="Emergency contact number (optional)"
+             autocomplete="off" maxlength="10" inputmode="numeric" class="standalone-input" />
+
+      <button id="sosBtn" class="btn-sos">
+        <span class="sos-pulse"></span>
+        <span class="sos-content">🚨 SEND SOS</span>
+      </button>
+      <p id="sosNote" class="sos-note"></p>
+    </div>
+
+    <!-- STEP 4 · Waiting -->
+    <div id="waitingStep" class="wizard-step">
+      <div class="radar-container">
+        <div class="radar-ring r1"></div>
+        <div class="radar-ring r2"></div>
+        <div class="radar-ring r3"></div>
+        <div class="radar-center">🚑</div>
+      </div>
+      <h2 class="step-title" style="margin-top:16px;">SOS Sent</h2>
+      <div class="status-badge-new en-route">
+        <span class="dot-pulse"></span>
+        Locating nearest ambulance
+      </div>
+      <p id="waitingMsg" class="step-desc">Connecting to the nearest available unit…</p>
+    </div>
+
+    <!-- STEP 5 · Assigned -->
+    <div id="assignedStep" class="wizard-step">
+      <div class="success-checkmark">
+        <svg viewBox="0 0 52 52">
+          <circle cx="26" cy="26" r="25" fill="none" />
+          <path fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+        </svg>
+      </div>
+      <h2 class="step-title assigned-title">Ambulance Assigned!</h2>
+
+      <div class="assignment-details-card" id="assignmentCard">
+        <div class="detail-row" id="assignedAmbulance"></div>
+        <div class="detail-row" id="assignedHospital"></div>
+        <div class="detail-row eta-row" id="assignedEta"></div>
+      </div>
+
+      <div class="live-tracking-note">
+        <span class="live-dot"></span>
+        Live location shared with dispatcher &amp; your ambulance
+      </div>
+    </div>
+
+  </main>
 
   <script src="js/socket.io.min.js"></script>
   <script src="js/patient.js"></script>

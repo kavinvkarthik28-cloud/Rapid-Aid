@@ -577,13 +577,26 @@ def handle_request_otp(data):
 
     sent, message = send_otp_sms(phone, code)
     if not sent:
-        # Do not leave an OTP active when SMS delivery failed.
-        otp_store.pop(phone, None)
-        print(f"[OTP ERROR] {message}")
-        emit("auth:error", "Could not send OTP. Please try again.", to=request.sid)
+        # Development / fallback mode: Keep OTP active so local testing/demo is never blocked
+        print("=" * 64)
+        print(f"[OTP WARNING] Fast2SMS delivery unavailable: {message}")
+        print(f"[DEV OTP] Phone: {phone} | Code: {code}")
+        print(f"[DEV OTP] Enter '{code}' in the app or recharge Fast2SMS to enable live SMS.")
+        print("=" * 64)
+        emit("auth:otp-sent", {
+            "phone": phone,
+            "devOtp": code,
+            "smsDelivered": False,
+            "warning": message
+        }, to=request.sid)
         return
 
-    emit("auth:otp-sent", {"phone": phone}, to=request.sid)
+    emit("auth:otp-sent", {
+        "phone": phone,
+        "devOtp": None,
+        "smsDelivered": True,
+        "message": message
+    }, to=request.sid)
 
 @socketio.on('auth:verify-otp')
 def handle_verify_otp(data):

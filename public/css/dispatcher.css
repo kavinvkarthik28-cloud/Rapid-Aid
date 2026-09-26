@@ -1,0 +1,562 @@
+/* ================================================
+   RAPID-AID DISPATCHER DASHBOARD — dispatcher.css
+   Modern, lively glassmorphic emergency coordination UI
+   ================================================ */
+
+.dispatcher-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background: #030712;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* ══════════════ HEADER ══════════════ */
+.dispatch-header {
+  height: 72px;
+  background: rgba(3, 7, 18, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 1000;
+  flex-shrink: 0;
+}
+
+.dh-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dh-brand-icon {
+  font-size: 26px;
+  filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.5));
+}
+
+.dh-brand-name {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 19px;
+  background: linear-gradient(135deg, #60a5fa 0%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.4px;
+}
+
+.dh-brand-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ---- Stat Pills ---- */
+.dh-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(17, 24, 39, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  transition: all 0.25s ease;
+}
+
+.stat-pill:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(31, 41, 55, 0.8);
+}
+
+.stat-icon { font-size: 15px; }
+
+.stat-count {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  color: #60a5fa;
+}
+
+.stat-label {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.incident-pill .stat-count {
+  color: #f87171;
+}
+
+.incident-pill {
+  border-color: rgba(239, 68, 68, 0.25);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* ---- Controls ---- */
+.dispatch-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ctrl-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(17, 24, 39, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ctrl-btn:hover {
+  background: rgba(31, 41, 55, 0.95);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.ctrl-btn:active {
+  transform: translateY(0);
+}
+
+.ctrl-btn.accent-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border: none;
+  color: white;
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.35);
+}
+
+.ctrl-btn.accent-btn:hover {
+  box-shadow: 0 4px 18px rgba(59, 130, 246, 0.5);
+  filter: brightness(1.1);
+}
+
+.ctrl-btn.danger-ctrl-btn {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+
+.ctrl-btn.danger-ctrl-btn:hover {
+  background: rgba(239, 68, 68, 0.22);
+  border-color: #f87171;
+}
+
+/* ══════════════ BODY ══════════════ */
+.dispatch-body {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: calc(100vh - 72px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ---- Leaflet Map Container Fixes ---- */
+#map {
+  flex: 1 1 auto;
+  height: 100% !important;
+  min-height: 100% !important;
+  width: 100% !important;
+  position: relative !important;
+  background: #060913 !important;
+  z-index: 1;
+}
+
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #060913 !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* Leaflet Tile dark mode fallback filter */
+.dark-tile-layer {
+  filter: brightness(0.7) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+/* Map marker div icons */
+.map-marker-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.map-marker-pin:hover {
+  transform: scale(1.25);
+}
+
+/* Custom Leaflet Layers Switcher Control */
+.leaflet-control-layers {
+  background: rgba(17, 24, 39, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 12px !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+  color: #f3f4f6 !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  padding: 8px 12px !important;
+}
+
+.leaflet-control-layers-toggle {
+  background-size: 20px 20px !important;
+  border-radius: 8px !important;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.5));
+}
+
+.leaflet-control-layers label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 6px !important;
+  cursor: pointer !important;
+}
+
+.leaflet-control-layers label:last-child {
+  margin-bottom: 0 !important;
+}
+
+.leaflet-control-layers input[type="radio"] {
+  accent-color: #3b82f6 !important;
+  cursor: pointer !important;
+}
+
+/* Custom leaflet tooltip styling */
+.leaflet-tooltip {
+  background: rgba(17, 24, 39, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #f3f4f6 !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  border-radius: 8px !important;
+  padding: 5px 9px !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6) !important;
+}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+  border-top-color: rgba(17, 24, 39, 0.95) !important;
+}
+
+/* ---- Right Sidebar Log Panel ---- */
+.log-panel {
+  width: 380px;
+  min-width: 320px;
+  max-width: 440px;
+  height: 100%;
+  background: rgba(3, 7, 18, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  gap: 16px;
+  overflow-y: auto;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+/* ---- Incident Panel ---- */
+.incident-panel {
+  background: rgba(17, 24, 39, 0.92);
+  border: 1.5px solid rgba(239, 68, 68, 0.4);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 30px rgba(239, 68, 68, 0.15);
+  animation: slideInDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes slideInDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0);     }
+}
+
+.ip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ip-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  color: #f87171;
+  letter-spacing: 0.3px;
+  flex: 1;
+  margin-left: 8px;
+}
+
+.ip-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.ip-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+}
+
+.ip-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.sev-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.dsev-opt {
+  background: rgba(31, 41, 55, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 8px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+  color: var(--text-muted);
+}
+
+.dsev-opt:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-main);
+}
+
+.dsev-opt.selected[data-value="9"] {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  font-weight: 700;
+}
+
+.dsev-opt.selected[data-value="7"] {
+  border-color: #f97316;
+  background: rgba(249, 115, 22, 0.15);
+  color: #fb923c;
+  font-weight: 700;
+}
+
+.dsev-opt.selected[data-value="4"] {
+  border-color: #eab308;
+  background: rgba(234, 179, 8, 0.15);
+  color: #fde047;
+  font-weight: 700;
+}
+
+.ip-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(17, 24, 39, 0.8);
+  border: 1.5px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  color: var(--text-main);
+  font-size: 13px;
+  font-family: inherit;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+}
+
+.ip-input:focus {
+  outline: none;
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.btn-incident {
+  width: 100%;
+  padding: 11px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+  color: white;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.35);
+  transition: all 0.2s;
+}
+
+.btn-incident:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+  filter: brightness(1.1);
+}
+
+/* ---- Map Hint ---- */
+.map-hint {
+  background: rgba(17, 24, 39, 0.4);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.map-hint .hint-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+/* ---- Reasoning Log Section ---- */
+.log-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: rgba(17, 24, 39, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 14px;
+  min-height: 240px;
+  overflow: hidden;
+}
+
+.log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.log-title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  color: #60a5fa;
+  text-transform: uppercase;
+}
+
+.log-clear {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.log-clear:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.log-feed {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.log-feed div {
+  background: rgba(3, 7, 18, 0.6);
+  border-left: 2.5px solid #3b82f6;
+  border-radius: 0 8px 8px 0;
+  padding: 8px 10px;
+  font-family: 'Fira Code', monospace, sans-serif;
+  font-size: 11.5px;
+  color: #e5e7eb;
+  line-height: 1.45;
+  animation: logItemFade 0.25s ease both;
+  word-break: break-word;
+}
+
+@keyframes logItemFade {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+
+.log-empty {
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
+  margin: auto;
+  padding: 20px;
+  line-height: 1.5;
+}
+
+/* ---- Incident Toast Notification ---- */
+.incident-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(17, 24, 39, 0.95);
+  border: 1.5px solid rgba(239, 68, 68, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(239, 68, 68, 0.3);
+  backdrop-filter: blur(16px);
+  color: #f3f4f6;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 13.5px;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: toastPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+@keyframes toastPop {
+  from { opacity: 0; transform: translate(-50%, 20px) scale(0.9); }
+  to   { opacity: 1; transform: translate(-50%, 0)    scale(1);   }
+}

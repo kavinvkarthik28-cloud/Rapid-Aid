@@ -1,36 +1,74 @@
 const socket = io({ transports: ["polling"] });
 let ambId = null;
 
+// ---- Smooth Step Transitions ----
+function show(stepId) {
+  const current = document.querySelector(".wizard-step.active");
+  const next = document.getElementById(stepId);
+  if (!next || current === next) return;
+
+  if (current) {
+    current.classList.remove("active");
+    current.classList.add("slide-exit");
+    setTimeout(() => {
+      current.classList.remove("slide-exit");
+      next.classList.add("active");
+    }, 240);
+  } else {
+    next.classList.add("active");
+  }
+}
+
 function joinAsAmbulance() {
   ambId = document.getElementById("ambIdInput").value.trim();
   const pin = document.getElementById("ambPinInput").value.trim();
-  if (!ambId || !pin) return alert("Enter your ambulance ID and PIN");
+  const errEl = document.getElementById("ambAuthError");
+  errEl.innerText = "";
+
+  if (!ambId || !pin) {
+    errEl.innerText = "Please enter both Ambulance ID and Duty PIN";
+    const box = document.getElementById("setupStep");
+    box.classList.remove("shake");
+    void box.offsetWidth;
+    box.classList.add("shake");
+    return;
+  }
 
   socket.emit("ambulance:join", { id: ambId, pin });
 }
 
 socket.on("ambulance:join-ok", () => {
-  document.getElementById("setup").classList.add("hidden");
-  document.getElementById("statusScreen").classList.remove("hidden");
-  document.getElementById("idLabel").innerText = "Ambulance " + ambId;
+  document.getElementById("unitLabel").innerText = "Ambulance Unit " + ambId;
+  show("onDutyStep");
   startGPS();
 });
 
 socket.on("auth:error", (msg) => {
-  document.getElementById("ambAuthError").innerText = msg;
+  const errEl = document.getElementById("ambAuthError");
+  errEl.innerText = msg;
+  const box = document.getElementById("setupStep");
+  box.classList.remove("shake");
+  void box.offsetWidth;
+  box.classList.add("shake");
 });
 
 document.getElementById("joinBtn").onclick = joinAsAmbulance;
 
-document.getElementById("ambIdInput").addEventListener("keydown", (e) => {
+document.getElementById("ambPinInput").addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
     joinAsAmbulance();
   }
 });
 
+document.getElementById("ambIdInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    document.getElementById("ambPinInput").focus();
+  }
+});
+
 // Coimbatore-area base points to simulate movement around, per ambulance ID.
-// Falls back deterministically so the same ID always starts near the same spot.
 const SIM_BASE_POINTS = [
   { lat: 11.0168, lng: 76.9558 },
   { lat: 11.0916, lng: 76.9950 },
@@ -39,6 +77,9 @@ const SIM_BASE_POINTS = [
 ];
 
 function startGPS() {
+  const gpsDot = document.getElementById("gpsDot");
+  const gpsText = document.getElementById("gpsText");
+
   if (!navigator.geolocation) {
     console.warn("Geolocation not supported — using simulated GPS instead");
     startSimulatedGPS();
@@ -50,6 +91,8 @@ function startGPS() {
   navigator.geolocation.watchPosition(
     (pos) => {
       receivedRealFix = true;
+      if (gpsDot) gpsDot.classList.remove("simulated");
+      if (gpsText) gpsText.innerText = "Live GPS Active (Accuracy ±" + Math.round(pos.coords.accuracy || 10) + "m)";
       socket.emit("ambulance:location", {
         id: ambId,
         lat: pos.coords.latitude,
@@ -58,16 +101,11 @@ function startGPS() {
     },
     (err) => {
       console.error("GPS error:", err);
-      // Common cause: page loaded over plain http:// on a non-localhost
-      // address — browsers block real geolocation there. Fall back
-      // automatically so the demo still works.
       if (!receivedRealFix) startSimulatedGPS();
     },
     { enableHighAccuracy: true, maximumAge: 2000, timeout: 8000 }
   );
 
-  // Safety net: if no real fix arrives within 8s (permission blocked
-  // silently, no error fired), fall back anyway.
   setTimeout(() => {
     if (!receivedRealFix) startSimulatedGPS();
   }, 8000);
@@ -75,16 +113,18 @@ function startGPS() {
 
 let simInterval = null;
 function startSimulatedGPS() {
-  if (simInterval) return; // already running
-  document.querySelector(".gps-note").innerText = "Using simulated GPS (real GPS unavailable)";
+  if (simInterval) return;
+  const gpsDot = document.getElementById("gpsDot");
+  const gpsText = document.getElementById("gpsText");
+  if (gpsDot) gpsDot.classList.add("simulated");
+  if (gpsText) gpsText.innerText = "Simulated GPS Active (Coimbatore Region)";
 
   const idx = Math.abs(hashCode(ambId)) % SIM_BASE_POINTS.length;
   let { lat, lng } = SIM_BASE_POINTS[idx];
 
   simInterval = setInterval(() => {
-    // small random walk so the marker visibly drifts on the map
-    lat += (Math.random() - 0.5) * 0.002;
-    lng += (Math.random() - 0.5) * 0.002;
+    lat += (Math.random() - 0.5) * 0.0015;
+    lng += (Math.random() - 0.5) * 0.0015;
     socket.emit("ambulance:location", { id: ambId, lat, lng });
   }, 2000);
 }
@@ -95,23 +135,41 @@ function hashCode(str) {
   return h;
 }
 
+// Assignment received from dispatcher / AI engine
 socket.on("assignment:new", ({ incident, hospital }) => {
-  const badge = document.getElementById("statusBadge");
-  badge.innerText = "EN ROUTE";
-  badge.className = "status-badge en-route";
+  const chip = document.getElementById("statusChip");
+  const ring = document.getElementById("statusRing");
+  const ringIcon = document.getElementById("ringIcon");
+  const dutyDesc = document.getElementById("dutyDesc");
+
+  chip.innerText = "DISPATCHED / EN ROUTE";
+  chip.className = "status-chip en-route";
+  if (ring) ring.classList.add("en-route");
+  if (ringIcon) ringIcon.innerText = "🚨";
+  if (dutyDesc) dutyDesc.innerText = "Active emergency response in progress. Proceed to incident location.";
 
   const card = document.getElementById("assignmentCard");
   card.classList.remove("hidden");
-  document.getElementById("assignIncident").innerText =
-    `Incident: ${incident.id} (severity ${incident.severity})`;
-  document.getElementById("assignHospital").innerText =
-    `Destination: ${hospital.name}`;
+  document.getElementById("assignIncident").innerHTML =
+    `<strong>Incident:</strong> #${incident.id} <span style="color:#f87171">(Severity ${incident.severity}/10)</span>`;
+  document.getElementById("assignHospital").innerHTML =
+    `<strong>Destination:</strong> ${hospital.name}`;
 });
 
+// Trip complete
 document.getElementById("completeBtn").onclick = () => {
   socket.emit("ambulance:complete", { id: ambId });
-  const badge = document.getElementById("statusBadge");
-  badge.innerText = "AVAILABLE";
-  badge.className = "status-badge available";
+
+  const chip = document.getElementById("statusChip");
+  const ring = document.getElementById("statusRing");
+  const ringIcon = document.getElementById("ringIcon");
+  const dutyDesc = document.getElementById("dutyDesc");
+
+  chip.innerText = "AVAILABLE";
+  chip.className = "status-chip available";
+  if (ring) ring.classList.remove("en-route");
+  if (ringIcon) ringIcon.innerText = "🚑";
+  if (dutyDesc) dutyDesc.innerText = "On duty and broadcasting your live location. Standby for assignment.";
+
   document.getElementById("assignmentCard").classList.add("hidden");
 };

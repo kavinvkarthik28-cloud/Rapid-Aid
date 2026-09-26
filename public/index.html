@@ -14,7 +14,7 @@
     background: #030712;
     overflow-x: hidden;
     overflow-y: auto;
-    height: auto;
+    min-height: 100vh;
     display: block;
     scroll-behavior: smooth;
   }
@@ -200,7 +200,7 @@
     50% { transform: translateY(6px); }
   }
 
-  /* ─── SECTION 2: ROLE SELECTION ─── */
+  /* ─── SECTION 2: ROLE SELECTION (PERFECT 4-GRID) ─── */
   .section-roles {
     position: relative;
     z-index: 1;
@@ -224,15 +224,15 @@
   .roles-sub {
     font-size: 16px;
     color: #6b7280;
-    margin-bottom: 56px;
+    margin-bottom: 48px;
     text-align: center;
   }
 
   .role-cards {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
-    max-width: 960px;
+    max-width: 1280px;
     width: 100%;
   }
 
@@ -240,12 +240,13 @@
     display: flex;
     flex-direction: column;
     text-decoration: none;
-    background: rgba(17,24,39,0.55);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(17, 24, 39, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 24px;
-    padding: 36px 28px;
-    transition: all 0.35s cubic-bezier(0.25,1,0.5,1);
+    padding: 32px 24px;
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
     position: relative;
     overflow: hidden;
   }
@@ -259,62 +260,93 @@
   }
   .role-card:hover { transform: translateY(-8px); }
 
-  /* Ambulance */
-  .card-ambulance::before { background: radial-gradient(circle at top left, rgba(239,68,68,0.12), transparent 60%); }
-  .card-ambulance:hover { border-color: rgba(239,68,68,0.4); box-shadow: 0 20px 40px rgba(239,68,68,0.15); }
+  /* Role Tag Badge */
+  .card-badge {
+    align-self: flex-start;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* 1. SOS / Patient (Crimson / Rose) */
+  .card-sos { border-color: rgba(244, 63, 94, 0.15); }
+  .card-sos::before { background: radial-gradient(circle at top left, rgba(244, 63, 94, 0.15), transparent 65%); }
+  .card-sos:hover { border-color: rgba(244, 63, 94, 0.5); box-shadow: 0 20px 40px rgba(244, 63, 94, 0.18); }
+  .card-sos:hover::before { opacity: 1; }
+  .badge-sos { background: rgba(244, 63, 94, 0.12); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+
+  /* 2. Ambulance (Amber / Flame) */
+  .card-ambulance { border-color: rgba(245, 158, 11, 0.15); }
+  .card-ambulance::before { background: radial-gradient(circle at top left, rgba(245, 158, 11, 0.15), transparent 65%); }
+  .card-ambulance:hover { border-color: rgba(245, 158, 11, 0.5); box-shadow: 0 20px 40px rgba(245, 158, 11, 0.18); }
   .card-ambulance:hover::before { opacity: 1; }
+  .badge-amber { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
 
-  /* Hospital */
-  .card-hospital::before { background: radial-gradient(circle at top left, rgba(16,185,129,0.12), transparent 60%); }
-  .card-hospital:hover { border-color: rgba(16,185,129,0.4); box-shadow: 0 20px 40px rgba(16,185,129,0.15); }
+  /* 3. Hospital (Emerald Green) */
+  .card-hospital { border-color: rgba(16, 185, 129, 0.15); }
+  .card-hospital::before { background: radial-gradient(circle at top left, rgba(16, 185, 129, 0.15), transparent 65%); }
+  .card-hospital:hover { border-color: rgba(16, 185, 129, 0.5); box-shadow: 0 20px 40px rgba(16, 185, 129, 0.18); }
   .card-hospital:hover::before { opacity: 1; }
+  .badge-green { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
 
-  /* Dispatcher */
-  .card-dispatcher::before { background: radial-gradient(circle at top left, rgba(59,130,246,0.12), transparent 60%); }
-  .card-dispatcher:hover { border-color: rgba(59,130,246,0.4); box-shadow: 0 20px 40px rgba(59,130,246,0.15); }
+  /* 4. Dispatcher (Electric Blue) */
+  .card-dispatcher { border-color: rgba(59, 130, 246, 0.15); }
+  .card-dispatcher::before { background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.15), transparent 65%); }
+  .card-dispatcher:hover { border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 20px 40px rgba(59, 130, 246, 0.18); }
   .card-dispatcher:hover::before { opacity: 1; }
+  .badge-blue { background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
 
   .card-icon-wrap {
-    width: 60px; height: 60px;
+    width: 58px; height: 58px;
     border-radius: 18px;
     display: flex; align-items: center; justify-content: center;
     font-size: 28px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
   }
-  .icon-red   { background: rgba(239,68,68,0.15); }
-  .icon-green { background: rgba(16,185,129,0.15); }
-  .icon-blue  { background: rgba(59,130,246,0.15); }
+  .icon-sos   { background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3); }
+  .icon-amber { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); }
+  .icon-green { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); }
+  .icon-blue  { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); }
 
   .card-title {
     font-family: 'Outfit', sans-serif;
-    font-size: 22px;
+    font-size: 21px;
     font-weight: 700;
     color: #f9fafb;
     margin-bottom: 10px;
   }
   .card-desc {
-    font-size: 14px;
-    color: #6b7280;
-    line-height: 1.65;
+    font-size: 13.5px;
+    color: #9ca3af;
+    line-height: 1.6;
     flex: 1;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
   }
   .card-features {
     list-style: none;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
   .card-features li {
-    font-size: 13px;
-    color: #9ca3af;
+    font-size: 12.5px;
+    color: #d1d5db;
     display: flex;
     align-items: center;
     gap: 8px;
   }
-  .card-features li::before { content: '✓'; font-weight: 700; font-size: 12px; }
-  .feat-red li::before   { color: #f87171; }
+  .card-features li::before { content: '✓'; font-weight: 800; font-size: 12px; }
+  .feat-sos li::before   { color: #fb7185; }
+  .feat-amber li::before { color: #fbbf24; }
   .feat-green li::before { color: #34d399; }
   .feat-blue li::before  { color: #60a5fa; }
 
@@ -322,18 +354,21 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 18px;
+    padding: 13px 18px;
     border-radius: 12px;
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: 700;
+    font-size: 13.5px;
+    font-family: 'Outfit', sans-serif;
     margin-top: auto;
     transition: all 0.3s;
+    letter-spacing: 0.2px;
   }
-  .cta-red   { background: rgba(239,68,68,0.12); color: #f87171; }
-  .cta-green { background: rgba(16,185,129,0.12); color: #34d399; }
-  .cta-blue  { background: rgba(59,130,246,0.12); color: #60a5fa; }
+  .cta-sos   { background: rgba(244, 63, 94, 0.12); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.25); }
+  .cta-amber { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.25); }
+  .cta-green { background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.25); }
+  .cta-blue  { background: rgba(59, 130, 246, 0.12); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.25); }
   .role-card:hover .card-cta { filter: brightness(1.3); }
-  .cta-arrow { font-size: 18px; transition: transform 0.3s; }
+  .cta-arrow { font-size: 16px; transition: transform 0.3s; }
   .role-card:hover .cta-arrow { transform: translateX(4px); }
 
   @keyframes fadeUp {
@@ -341,9 +376,18 @@
     to   { opacity:1; transform:translateY(0); }
   }
 
-  /* ─── RESPONSIVE ─── */
-  @media (max-width: 760px) {
-    .role-cards { grid-template-columns: 1fr; max-width: 440px; }
+  /* ─── RESPONSIVE: PERFECT 4 → 2x2 → 1 ─── */
+  @media (max-width: 1120px) {
+    .role-cards {
+      grid-template-columns: repeat(2, 1fr);
+      max-width: 800px;
+    }
+  }
+  @media (max-width: 640px) {
+    .role-cards {
+      grid-template-columns: 1fr;
+      max-width: 440px;
+    }
     .stat-pills { gap: 8px; }
   }
 </style>
@@ -388,55 +432,58 @@
 
   </section>
 
-  <!-- ── SECTION 2: ROLE CARDS ── -->
+  <!-- ── SECTION 2: 4 ROLE CARDS (BALANCED 4-COLUMN / 2x2 GRID) ── -->
   <section class="section-roles" id="roles">
 
-    <h2 class="roles-heading">Who are you?</h2>
-    <p class="roles-sub">Select your role to enter the live coordination system.</p>
+    <h2 class="roles-heading">Choose Portal</h2>
+    <p class="roles-sub">Select your role to enter the live emergency coordination system.</p>
 
     <div class="role-cards">
 
-      <!-- SOS / Patient -->
-      <a class="role-card card-ambulance" href="patient.html" id="sos-card">
-        <div class="card-icon-wrap icon-red">🆘</div>
+      <!-- 1. SOS / Patient -->
+      <a class="role-card card-sos" href="patient.html" id="sos-card">
+        <div class="card-badge badge-sos">🚨 Public SOS</div>
+        <div class="card-icon-wrap icon-sos">🆘</div>
         <div class="card-title">I Need Help</div>
-        <p class="card-desc">Verify your phone, send an SOS with your live location, and get matched to the nearest available ambulance.</p>
-        <ul class="card-features feat-red">
+        <p class="card-desc">Verify phone, trigger instant SOS with live GPS, and receive immediate ambulance assignment.</p>
+        <ul class="card-features feat-sos">
           <li>OTP-verified reporting</li>
-          <li>Live GPS-based SOS</li>
-          <li>Real-time assignment status</li>
+          <li>Live GPS broadcast</li>
+          <li>Real-time assigned unit</li>
         </ul>
-        <div class="card-cta cta-red">
-          Send SOS
+        <div class="card-cta cta-sos">
+          Request Ambulance
           <span class="cta-arrow">→</span>
         </div>
       </a>
 
-      <!-- Ambulance -->
+      <!-- 2. Ambulance -->
       <a class="role-card card-ambulance" href="ambulance.html" id="ambulance-card">
-        <div class="card-icon-wrap icon-red">🚑</div>
+        <div class="card-badge badge-amber">🚑 Field Unit</div>
+        <div class="card-icon-wrap icon-amber">🚑</div>
         <div class="card-title">Ambulance</div>
-        <p class="card-desc">Stream your live GPS position and receive real-time dispatch assignments from the AI coordinator.</p>
-        <ul class="card-features feat-red">
+        <p class="card-desc">Stream live location, standby on-duty, and receive instant turn-by-turn dispatch alerts.</p>
+        <ul class="card-features feat-amber">
           <li>Live GPS streaming</li>
-          <li>Instant assignment alerts</li>
-          <li>Simulated fallback GPS</li>
+          <li>Instant dispatch alerts</li>
+          <li>One-tap trip completion</li>
         </ul>
-        <div class="card-cta cta-red">
+        <div class="card-cta cta-amber">
           Enter as Ambulance
           <span class="cta-arrow">→</span>
         </div>
       </a>
 
-      <!-- Hospital -->
+      <!-- 3. Hospital -->
       <a class="role-card card-hospital" href="hospital.html" id="hospital-card">
+        <div class="card-badge badge-green">🏥 Medical Center</div>
         <div class="card-icon-wrap icon-green">🏥</div>
         <div class="card-title">Hospital</div>
-        <p class="card-desc">Monitor your bed capacity and receive real-time incoming patient notifications as the AI assigns cases.</p>
+        <p class="card-desc">Monitor live beds, receive real-time incoming patient notifications, and prepare staff.</p>
         <ul class="card-features feat-green">
           <li>Incoming patient alerts</li>
-          <li>Severity &amp; ambulance info</li>
-          <li>One-tap acknowledgement</li>
+          <li>Severity &amp; casualty info</li>
+          <li>One-tap preparation ack</li>
         </ul>
         <div class="card-cta cta-green">
           Enter as Hospital
@@ -444,18 +491,19 @@
         </div>
       </a>
 
-      <!-- Dispatcher -->
+      <!-- 4. Dispatcher -->
       <a class="role-card card-dispatcher" href="dispatcher.html" id="dispatcher-card">
+        <div class="card-badge badge-blue">🖥️ Command HQ</div>
         <div class="card-icon-wrap icon-blue">🖥️</div>
         <div class="card-title">Dispatcher</div>
-        <p class="card-desc">Monitor the live map, trigger incidents, view the AI reasoning log, and simulate road blocks for replanning.</p>
+        <p class="card-desc">Monitor interactive map, dispatch incidents, simulate road blocks, and view AI reasoning.</p>
         <ul class="card-features feat-blue">
-          <li>Live ambulance tracking</li>
-          <li>AI reasoning log</li>
+          <li>Interactive dispatch map</li>
+          <li>AI CSP reasoning logs</li>
           <li>Road block simulation</li>
         </ul>
         <div class="card-cta cta-blue">
-          Open Dispatcher View
+          Open Command View
           <span class="cta-arrow">→</span>
         </div>
       </a>

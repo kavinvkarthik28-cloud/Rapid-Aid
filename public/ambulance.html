@@ -1,32 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>RapidAid — Ambulance</title>
-<link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RapidAid — Ambulance</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/ambulance.css" />
 </head>
 <body class="ambulance-page">
   <div class="bg-glow"></div>
-  <div id="setup" class="setup-box fade-in-up">
-    <h2>Ambulance Sign-in</h2>
-    <input id="ambIdInput" placeholder="Ambulance ID e.g. A1" autocomplete="off" />
-    <input id="ambPinInput" placeholder="PIN" type="password" autocomplete="off" maxlength="4" />
-    <button id="joinBtn">Start Duty</button>
-    <p id="ambAuthError" style="color:#f87171; font-size:13px;"></p>
-  </div>
 
-  <div id="statusScreen" class="status-screen hidden fade-in-up">
-    <div id="statusBadge" class="status-badge available">AVAILABLE</div>
-    <div id="idLabel" class="id-label"></div>
-    <div id="assignmentCard" class="assignment-card hidden">
-      <h3>New Assignment</h3>
-      <p id="assignIncident"></p>
-      <p id="assignHospital"></p>
-      <button id="completeBtn">Mark Arrived / Complete Trip</button>
+  <!-- ── Header ── -->
+  <header class="role-header">
+    <div class="brand">
+      <span class="brand-icon">🚑</span>
+      <span class="brand-name">RapidAid</span>
     </div>
-    <p class="gps-note">Streaming live GPS…</p>
-  </div>
+    <div class="role-chip">Ambulance Unit</div>
+  </header>
+
+  <main class="wizard-container">
+
+    <!-- STEP 1 · Sign-in -->
+    <div id="setupStep" class="wizard-step active">
+      <div class="step-icon amb-icon">🚑</div>
+      <h1 class="step-title">Ambulance Sign-in</h1>
+      <p class="step-desc">Identify your unit to go on duty and start streaming your live location to the dispatcher.</p>
+
+      <div class="form-field">
+        <label class="field-label">Ambulance ID</label>
+        <input id="ambIdInput" class="field-input" placeholder="e.g. A1, A2, A3…" autocomplete="off" />
+      </div>
+      <div class="form-field">
+        <label class="field-label">Duty PIN</label>
+        <input id="ambPinInput" class="field-input" placeholder="4-digit PIN" type="password" autocomplete="off" maxlength="4" inputmode="numeric" />
+      </div>
+      <p id="ambAuthError" class="field-error"></p>
+
+      <button id="joinBtn" class="btn-primary">
+        <span class="btn-text">Start Duty</span>
+        <span class="btn-icon">→</span>
+      </button>
+    </div>
+
+    <!-- STEP 2 · On Duty / Available -->
+    <div id="onDutyStep" class="wizard-step">
+      <!-- Dynamic status ring -->
+      <div class="status-ring" id="statusRing">
+        <div class="ring-pulse"></div>
+        <div class="ring-pulse p2"></div>
+        <div class="ring-center" id="ringIcon">🚑</div>
+      </div>
+
+      <div class="status-chip available" id="statusChip">AVAILABLE</div>
+      <h2 class="step-title unit-title" id="unitLabel">Ambulance —</h2>
+      <p class="step-desc" id="dutyDesc">On duty and broadcasting your live location. Standby for assignment.</p>
+
+      <!-- GPS status -->
+      <div class="gps-bar" id="gpsBar">
+        <span class="gps-dot" id="gpsDot"></span>
+        <span id="gpsText">Acquiring GPS signal…</span>
+      </div>
+
+      <!-- Assignment card — hidden until assigned -->
+      <div id="assignmentCard" class="assignment-card-new hidden">
+        <div class="assign-header">
+          <span class="assign-icon">📍</span>
+          <span class="assign-title">New Assignment</span>
+        </div>
+        <div class="assign-row" id="assignIncident"></div>
+        <div class="assign-row" id="assignHospital"></div>
+        <button id="completeBtn" class="btn-complete">
+          <span>✓</span> Mark Trip Complete
+        </button>
+      </div>
+    </div>
+
+  </main>
 
   <script src="js/socket.io.min.js"></script>
   <script src="js/ambulance.js"></script>
