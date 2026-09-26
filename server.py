@@ -172,8 +172,40 @@ def send_otp_sms(phone, code):
         return False, f"SMS sending failed: {exc}"
 
 def send_family_sms(phone, message):
-    # TODO: replace with a real SMS gateway call once required for emergency contacts.
-    print(f"[MOCK SMS to family/emergency contact {phone}]: {message}")
+    """Send Next-of-Kin SMS alert via Fast2SMS with clear dev console fallback."""
+    api_key = os.environ.get("FAST2SMS_API_KEY", "").strip()
+    print("=" * 64)
+    print(f"[NEXT-OF-KIN ALERT] Phone: {phone}")
+    print(f"[NEXT-OF-KIN ALERT] Message: {message}")
+    print("=" * 64)
+
+    if not api_key or api_key == "PASTE_YOUR_FAST2SMS_API_KEY_HERE":
+        return False, "FAST2SMS_API_KEY is not configured"
+
+    payload = {
+        "route": "q",
+        "message": message,
+        "numbers": phone,
+        "sms_details": "1"
+    }
+    req = urllib.request.Request(
+        "https://www.fast2sms.com/dev/bulkV2",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": api_key,
+            "accept": "application/json",
+            "content-type": "application/json"
+        },
+        method="POST"
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=10) as response:
+            body = response.read().decode("utf-8", errors="replace")
+            print(f"[NEXT-OF-KIN SMS SENT] {body}")
+            return True, "SMS sent to emergency contact"
+    except Exception as exc:
+        print(f"[NEXT-OF-KIN SMS FAILED] {exc}")
+        return False, str(exc)
 
 
 # ---------------------------------------------------------------
@@ -283,6 +315,8 @@ last_assignment = None
 socket_data = {}
 pending_incidents = []
 active_patients = {}  # patientSocketId -> {"incidentId":..., "assignedAmbulanceSid":...} for live tracking routing
+active_assignments = {}  # incidentId -> {incident, ambulance, hospital, result, etaMinutes, status}
+ambulance_to_incident = {}  # ambulanceId -> incidentId
 
 # ---------------------------------------------------------------
 # KNOWLEDGE BASE — forward chaining
@@ -366,12 +400,23 @@ def select_best_ambulance_and_hospital(incident, log_fn):
 
 
 # ---------------------------------------------------------------
-# ASSIGNMENT + PRIORITY QUEUE
+# ASSIGNMENT + PRIORITY QUEUE + NEXT-OF-KIN TRACKING
 # ---------------------------------------------------------------
 def finalize_assignment(incident, result):
     global last_assignment
     ambulance, hospital = result["ambulance"], result["hospital"]
+    eta_min = max(1, round((result["amb_dist_m"] / 1000) / 30 * 60))
+
     last_assignment = {"incident": incident, "ambulance": ambulance, "hospital": hospital}
+    active_assignments[incident["id"]] = {
+        "incident": incident,
+        "ambulance": ambulance,
+        "hospital": hospital,
+        "result": result,
+        "etaMinutes": eta_min,
+        "status": "en-route"
+    }
+    ambulance_to_incident[ambulance["id"]] = incident["id"]
 
     ambulances[ambulance["id"]]["status"] = "en-route"
     for h in hospitals:
@@ -390,21 +435,38 @@ def finalize_assignment(incident, result):
 
     patient_sid = incident.get("patientSocketId")
     if patient_sid:
-        eta_min = (result["amb_dist_m"] / 1000) / 30 * 60
         emit("sos:assignment", {
-            "hospital": hospital["name"], "ambulanceId": ambulance["id"], "etaMinutes": round(eta_min),
+            "hospital": hospital["name"],
+            "ambulanceId": ambulance["id"],
+            "etaMinutes": eta_min,
+            "incidentId": incident["id"],
+            "trackUrl": f"track.html?id={incident['id']}"
         }, to=patient_sid)
 
-        # Register this patient for live-tracking routing: their future
-        # location updates go to the dispatcher room + this specific
-        # ambulance's socket, never broadcast publicly.
+        # Register this patient for live-tracking routing
         active_patients[patient_sid] = {"incidentId": incident["id"], "assignedAmbulanceSid": ambulance["socketId"]}
 
-        # Family/emergency-contact notification (Phase 4) — currently
-        # mocked; becomes a real SMS once a gateway API key is wired in.
-        contact = incident.get("emergencyContact")
-        if contact:
-            send_family_sms(contact, f"Your family member has been assigned an ambulance, heading to {hospital['name']}. Ambulance ID: {ambulance['id']}.")
+    # Next-of-Kin Emergency Contact Alert with Live GPS Link
+    contact = incident.get("emergencyContact")
+    if contact:
+        track_url = f"/track.html?id={incident['id']}"
+        sms_msg = (
+            f"RapidAid Alert: Your contact is being transported to {hospital['name']} "
+            f"by Ambulance Unit {ambulance['id']}. Track live location & hospital: {track_url}"
+        )
+        send_family_sms(contact, sms_msg)
+        emit("log:event", f"Next-of-Kin SMS sent to emergency contact {contact}", broadcast=True)
+
+    # Broadcast to any open tracking room
+    emit("track:init", {
+        "found": True,
+        "incident": incident,
+        "ambulance": ambulance,
+        "hospital": hospital,
+        "route": {"ambPath": result["amb_path"], "hospPath": result["hosp_path"]},
+        "etaMinutes": eta_min,
+        "status": "en-route"
+    }, room=f"track:{incident['id']}")
 
     emit("state:update", {
         "ambulances": ambulances, "hospitals": hospitals,
@@ -443,6 +505,26 @@ def index():
 def graph_info():
     return {"usingRealGraph": USING_REAL_GRAPH, "nodeCount": len(GRAPH_NODES), "edgeCount": len(GRAPH_EDGES)}
 
+@app.route('/api/track/<incident_id>')
+def api_track_incident(incident_id):
+    assignment = active_assignments.get(incident_id)
+    if not assignment:
+        return {"found": False, "incidentId": incident_id}, 404
+    amb_id = assignment["ambulance"]["id"]
+    current_amb = ambulances.get(amb_id, assignment["ambulance"])
+    return {
+        "found": True,
+        "incident": assignment["incident"],
+        "ambulance": current_amb,
+        "hospital": assignment["hospital"],
+        "route": {
+            "ambPath": assignment["result"].get("amb_path", []),
+            "hospPath": assignment["result"].get("hosp_path", [])
+        },
+        "etaMinutes": assignment.get("etaMinutes", 8),
+        "status": assignment.get("status", "en-route")
+    }
+
 
 # ---------------------------------------------------------------
 # SOCKET.IO EVENTS
@@ -455,6 +537,31 @@ def handle_connect():
 def handle_dispatcher_join():
     join_room(DISPATCHER_ROOM)
     emit("state:update", {"ambulances": ambulances, "hospitals": hospitals}, to=request.sid)
+
+@socketio.on('track:join')
+def handle_track_join(data):
+    inc_id = data.get('incidentId')
+    if not inc_id:
+        return
+    join_room(f"track:{inc_id}")
+    assignment = active_assignments.get(inc_id)
+    if assignment:
+        amb_id = assignment["ambulance"]["id"]
+        current_amb = ambulances.get(amb_id, assignment["ambulance"])
+        emit("track:init", {
+            "found": True,
+            "incident": assignment["incident"],
+            "ambulance": current_amb,
+            "hospital": assignment["hospital"],
+            "route": {
+                "ambPath": assignment["result"].get("amb_path", []),
+                "hospPath": assignment["result"].get("hosp_path", [])
+            },
+            "etaMinutes": assignment.get("etaMinutes", 8),
+            "status": assignment.get("status", "en-route")
+        }, to=request.sid)
+    else:
+        emit("track:init", {"found": False, "incidentId": inc_id}, to=request.sid)
 
 @socketio.on('ambulance:join')
 def handle_ambulance_join(data):
@@ -477,9 +584,20 @@ def handle_ambulance_join(data):
 def handle_ambulance_location(data):
     amb_id = data.get('id')
     if amb_id in ambulances:
-        ambulances[amb_id]["lat"] = data.get('lat')
-        ambulances[amb_id]["lng"] = data.get('lng')
+        lat = data.get('lat')
+        lng = data.get('lng')
+        ambulances[amb_id]["lat"] = lat
+        ambulances[amb_id]["lng"] = lng
         emit("state:update", {"ambulances": ambulances, "hospitals": hospitals}, broadcast=True)
+
+        inc_id = ambulance_to_incident.get(amb_id)
+        if inc_id:
+            emit("track:location", {
+                "incidentId": inc_id,
+                "ambulanceId": amb_id,
+                "lat": lat,
+                "lng": lng
+            }, room=f"track:{inc_id}")
 
 @socketio.on('ambulance:complete')
 def handle_ambulance_complete(data):
@@ -487,6 +605,16 @@ def handle_ambulance_complete(data):
     with state_lock:
         if amb_id in ambulances:
             ambulances[amb_id]["status"] = "available"
+            inc_id = ambulance_to_incident.pop(amb_id, None)
+            if inc_id and inc_id in active_assignments:
+                active_assignments[inc_id]["status"] = "arrived"
+                hosp = active_assignments[inc_id]["hospital"]
+                emit("track:arrived", {
+                    "incidentId": inc_id,
+                    "status": "arrived",
+                    "hospital": hosp
+                }, room=f"track:{inc_id}")
+
             emit("log:event", f"Ambulance {amb_id} completed trip — now available", broadcast=True)
             emit("state:update", {"ambulances": ambulances, "hospitals": hospitals}, broadcast=True)
             process_pending_queue()

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RapidAid — Live Patient & Ambulance Tracker</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/track.css" />
+</head>
+<body class="track-page">
+
+  <!-- ══════════════ HEADER ══════════════ -->
+  <header class="track-header">
+    <div class="th-brand">
+      <span class="th-icon">🚑</span>
+      <div>
+        <div class="th-title">RapidAid Emergency Tracker</div>
+        <div class="th-sub" id="incidentSub">Live Ambulance & Hospital Transit</div>
+      </div>
+    </div>
+    <div class="th-live-badge">
+      <span class="live-dot"></span> LIVE GPS
+    </div>
+  </header>
+
+  <!-- ══════════════ BODY ══════════════ -->
+  <div class="track-container">
+    
+    <!-- Leaflet Map -->
+    <div id="trackMap"></div>
+
+    <!-- Floating Tracking Card -->
+    <aside class="track-sheet">
+
+      <!-- Status Header -->
+      <div class="status-banner">
+        <div class="sb-indicator">
+          <span class="sb-pulse"></span>
+          <span id="transitStatusText">EN ROUTE TO HOSPITAL</span>
+        </div>
+        <div class="sb-eta" id="etaBadge">ETA: ~8 min</div>
+      </div>
+
+      <!-- Step Timeline -->
+      <div class="transit-timeline">
+        <div class="tl-step completed">
+          <div class="tl-dot">✓</div>
+          <div class="tl-label">SOS Verified</div>
+        </div>
+        <div class="tl-line completed"></div>
+        <div class="tl-step completed">
+          <div class="tl-dot">✓</div>
+          <div class="tl-label">Ambulance Dispatched</div>
+        </div>
+        <div class="tl-line active"></div>
+        <div class="tl-step active" id="tlTransit">
+          <div class="tl-dot">🚑</div>
+          <div class="tl-label">Hospital Transit</div>
+        </div>
+        <div class="tl-line" id="tlLineDest"></div>
+        <div class="tl-step" id="tlArrived">
+          <div class="tl-dot">🏥</div>
+          <div class="tl-label">Emergency Ward</div>
+        </div>
+      </div>
+
+      <!-- Hospital Details Card -->
+      <div class="info-card hosp-card">
+        <div class="card-header">
+          <span class="ch-icon">🏥</span>
+          <div>
+            <div class="ch-title">Destination Hospital</div>
+            <div class="ch-name" id="hospName">City General Hospital</div>
+          </div>
+          <span class="bed-chip" id="hospBeds">Beds Ready</span>
+        </div>
+        <div class="card-meta">
+          <div class="meta-row">
+            <span class="meta-label">📍 Address:</span>
+            <span class="meta-val" id="hospAddress">Coimbatore Medical District</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">🚨 Severity:</span>
+            <span class="meta-val sev-val" id="incSeverity">Critical (Level 9/10)</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <a href="tel:108" class="action-btn call-btn">
+            <span>📞</span> Call Emergency Desk
+          </a>
+          <a id="navBtn" target="_blank" class="action-btn nav-btn">
+            <span>🗺️</span> Navigate to Hospital
+          </a>
+        </div>
+      </div>
+
+      <!-- Ambulance Unit Details -->
+      <div class="info-card amb-card">
+        <div class="card-header">
+          <span class="ch-icon">🚑</span>
+          <div>
+            <div class="ch-title">Assigned Ambulance</div>
+            <div class="ch-name" id="ambId">Unit A1 (Advanced Life Support)</div>
+          </div>
+          <span class="gps-active-badge">
+            <span class="gps-dot"></span> Live GPS
+          </span>
+        </div>
+        <div class="card-meta">
+          <div class="meta-row">
+            <span class="meta-label">📡 GPS Stream:</span>
+            <span class="meta-val" id="gpsStatus">Connected (Broadcasting every 2s)</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">📋 Incident ID:</span>
+            <span class="meta-val" id="incIdDisplay">#INC1</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Share Action -->
+      <button id="shareBtn" class="share-btn">
+        <span>📲</span> Share Live Tracking with Family
+      </button>
+
+    </aside>
+  </div>
+
+  <!-- Toast -->
+  <div id="trackToast" class="track-toast hidden"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/socket.io.min.js"></script>
+  <script src="js/track.js"></script>
+</body>
+</html>

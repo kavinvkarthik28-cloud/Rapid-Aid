@@ -287,13 +287,19 @@ function sendSOSFallback(severity, contact) {
 /* ════════════════════════════════════════════
    STEP 4 & 5 — WAITING → ASSIGNED
    ════════════════════════════════════════════ */
-socket.on('sos:assignment', ({ hospital, ambulanceId, etaMinutes }) => {
+socket.on('sos:assignment', ({ hospital, ambulanceId, etaMinutes, incidentId }) => {
   document.getElementById('assignedHospital').innerHTML =
     `🏥 <strong>Hospital:</strong> ${hospital}`;
   document.getElementById('assignedAmbulance').innerHTML =
     `🚑 <strong>Ambulance:</strong> ${ambulanceId}`;
   document.getElementById('assignedEta').innerHTML =
     `⏱ ETA: ~${etaMinutes} min`;
+
+  const trackBtn = document.getElementById('trackLinkBtn');
+  if (trackBtn && incidentId) {
+    trackBtn.href = `track.html?id=${incidentId}`;
+  }
+
   show('assignedStep');
   startLiveTracking();
 });
