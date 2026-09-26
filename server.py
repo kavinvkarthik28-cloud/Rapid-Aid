@@ -18,8 +18,32 @@ import heapq
 import time
 import random
 import threading
+import urllib.request
+import urllib.error
 from datetime import datetime
 from flask import Flask, request
+
+
+# Load local .env values without adding another dependency.
+# Real environment variables always take precedence.
+def load_local_env(path=".env"):
+    if not os.path.exists(path):
+        return
+    try:
+        with open(path, encoding="utf-8") as env_file:
+            for raw_line in env_file:
+                line = raw_line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, value = line.split("=", 1)
+                key = key.strip()
+                value = value.strip().strip("\"").strip("'")
+                if key and key not in os.environ:
+                    os.environ[key] = value
+    except OSError:
+        pass
+
+load_local_env()
 from flask_socketio import SocketIO, emit, join_room
 
 app = Flask(__name__, static_folder='public', static_url_path='')
@@ -78,17 +102,77 @@ def rate_limited(sid):
 
 
 # ---------------------------------------------------------------
-# OTP AUTHENTICATION — real flow, mocked SMS delivery only
+# OTP AUTHENTICATION — real SMS delivery via Fast2SMS Quick SMS
 # ---------------------------------------------------------------
 otp_store = {}
 OTP_TTL_SECONDS = 300
 
 def send_otp_sms(phone, code):
-    # TODO: replace with a real SMS gateway call (Fast2SMS recommended).
-    print(f"[MOCK SMS] OTP for {phone}: {code}  (would be texted in production)")
+    """Send the OTP using Fast2SMS Quick SMS.
+
+    This keeps RapidAid's existing OTP generation and verification logic.
+    Fast2SMS Quick SMS uses the /dev/bulkV2 endpoint with route=q and
+    does not require a Smart OTP template ID.
+
+    Returns:
+      (True, message) on success, (False, message) on failure.
+    """
+    api_key = os.environ.get("FAST2SMS_API_KEY", "").strip()
+    if not api_key or api_key == "PASTE_YOUR_FAST2SMS_API_KEY_HERE":
+        return False, "FAST2SMS_API_KEY is not configured"
+
+    message = (
+        f"Rapid-Aid OTP: {code}. Valid for 5 minutes. "
+        "Do not share this code."
+    )
+
+    payload = {
+        "route": "q",
+        "message": message,
+        "numbers": phone,
+        "sms_details": "1"
+    }
+
+    req = urllib.request.Request(
+        "https://www.fast2sms.com/dev/bulkV2",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": api_key,
+            "accept": "application/json",
+            "content-type": "application/json"
+        },
+        method="POST"
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=15) as response:
+            body = response.read().decode("utf-8", errors="replace")
+            try:
+                result = json.loads(body)
+            except json.JSONDecodeError:
+                result = {}
+
+            if 200 <= response.status < 300 and result.get("return") is not False:
+                print(f"[OTP] SMS sent to ******{phone[-4:]}")
+                return True, "OTP sent successfully"
+
+            return False, result.get("message", "Fast2SMS rejected the SMS request")
+
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        try:
+            result = json.loads(body)
+            detail = result.get("message", body)
+        except json.JSONDecodeError:
+            detail = body or str(exc)
+        return False, f"Fast2SMS error: {detail}"
+    except urllib.error.URLError as exc:
+        return False, f"Could not reach Fast2SMS: {exc.reason}"
+    except Exception as exc:
+        return False, f"SMS sending failed: {exc}"
 
 def send_family_sms(phone, message):
-    # TODO: replace with a real SMS gateway call once Fast2SMS API key is available.
+    # TODO: replace with a real SMS gateway call once required for emergency contacts.
     print(f"[MOCK SMS to family/emergency contact {phone}]: {message}")
 
 
@@ -490,7 +574,15 @@ def handle_request_otp(data):
         return
     code = f"{random.randint(0, 999999):06d}"
     otp_store[phone] = {"code": code, "expires": time.time() + OTP_TTL_SECONDS, "verified": False}
-    send_otp_sms(phone, code)
+
+    sent, message = send_otp_sms(phone, code)
+    if not sent:
+        # Do not leave an OTP active when SMS delivery failed.
+        otp_store.pop(phone, None)
+        print(f"[OTP ERROR] {message}")
+        emit("auth:error", "Could not send OTP. Please try again.", to=request.sid)
+        return
+
     emit("auth:otp-sent", {"phone": phone}, to=request.sid)
 
 @socketio.on('auth:verify-otp')
